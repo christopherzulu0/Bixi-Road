@@ -1,0 +1,186 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String    @id @default(cuid())
+  email                  String    @unique
+  clerkId                String    @unique
+  firstName              String    @map("first_name")
+  lastName               String?    @map("last_name")
+  dateOfBirth            DateTime? @map("date_of_birth")
+  gender                 Gender?
+  nationality            String?
+  phone                  String?
+  address                String?
+  city                   String?
+  state                  String?
+  zipCode                String?   @map("zip_code")
+  country                String?
+  bio                    String?
+  role                   Role      @default(buyer)
+  status                 String?   @default("active") // Generic status field
+  EmergencyContactName   String?
+  EmergencyContactNumber String?
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  sellerApplications SellerApplication[]
+  articles           Article[]
+  productListings    ProductListing[]
+
+  @@map("users")
+}
+
+enum Role {
+  admin
+  seller
+  buyer
+}
+
+model SellerApplication {
+  id               String                  @id @default(cuid())
+  userId           String
+  country          String
+  phone            String
+  bio              String
+  mineLocation     String                  @map("mine_location")
+  miningLicenseUrl String                  @map("mining_license_url")
+  idDocumentUrl    String                  @map("id_document_url")
+  companyCertUrl   String?                 @map("company_cert_url")
+  status           SellerApplicationStatus @default(PENDING)
+  submittedAt      DateTime                @default(now()) @map("submitted_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("seller_applications")
+}
+
+enum SellerApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model Article {
+  id                 String         @id @default(cuid())
+  title              String
+  slug               String         @unique
+  category           ArticleCategory
+  excerpt            String?        @db.Text
+  content            String         @db.Text
+  coverImageUrl      String?        @map("cover_image_url")
+  imageGalleryUrls   String[]       @map("image_gallery_urls")
+  youtubeVideoUrl    String?        @map("youtube_video_url")
+  isPublished        Boolean        @default(false) @map("is_published")
+  featured           Boolean        @default(false)
+  views              Int            @default(0)
+  authorId           String         @map("author_id")
+  publishedAt        DateTime?      @map("published_at")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+
+  author User @relation(fields: [authorId], references: [id])
+
+  @@index([authorId])
+  @@index([category])
+  @@index([isPublished])
+  @@index([featured])
+  @@index([publishedAt])
+  @@map("articles")
+}
+
+enum ArticleCategory {
+  MARKET_PRICES
+  MINING_LAWS
+  EXPORT_PROCEDURES
+  TRADING_TIPS
+  SUCCESS_STORIES
+  INDUSTRY_NEWS
+}
+
+model ProductListing {
+  id               String              @id @default(cuid())
+  title            String
+  category         ProductCategory
+  description      String              @db.Text
+  imageUrls        String[]            @map("image_urls")
+  quantity         Float
+  unit             ProductUnit
+  purityGrade      String?             @map("purity_grade")
+  pricePerUnit     Float               @map("price_per_unit")
+  country          String
+  region           String?
+  shippingDetails  String?             @db.Text @map("shipping_details")
+  status           ListingStatus       @default(PENDING_REVIEW)
+  sellerId         String              @map("seller_id")
+  views            Int                 @default(0)
+  isActive         Boolean             @default(true) @map("is_active")
+  approvedAt       DateTime?           @map("approved_at")
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  seller User @relation(fields: [sellerId], references: [id])
+
+  @@index([sellerId])
+  @@index([category])
+  @@index([status])
+  @@index([isActive])
+  @@index([approvedAt])
+  @@map("product_listings")
+}
+
+enum ProductCategory {
+  GOLD
+  DIAMOND
+  EMERALD
+  RUBY
+  SAPPHIRE
+  COPPER
+  LITHIUM
+  COBALT
+  COLTAN
+  URANIUM
+  IRON_ORE
+  BAUXITE
+  OTHER_GEMSTONE
+  OTHER_MINERAL
+}
+
+enum ProductUnit {
+  GRAMS
+  KILOGRAMS
+  TONNES
+  CARATS
+  PIECES
+}
+
+enum ListingStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  SHIPPED_TO_HUB
+  VERIFIED
+  LIVE
+  SOLD
+  CANCELLED
+}

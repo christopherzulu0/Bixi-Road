@@ -1,0 +1,8 @@
+ignoredBuiltDependencies:
+  - '@clerk/shared'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - msgpackr-extract
+  - prisma
+  - sharp
+  - unrs-resolver
