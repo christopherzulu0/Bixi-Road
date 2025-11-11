@@ -64,8 +64,8 @@ export default function NewsArticlePage() {
 
   const displayDate = article ? new Date(article.publishedAt ?? article.createdAt) : null;
 
-    const getCategoryColor = (category) => {
-        const colors = {
+    const getCategoryColor = (category: string): string => {
+        const colors: { [key: string]: string } = {
             "Market Prices": "bg-green-100 text-green-800",
             "Mining Laws": "bg-blue-100 text-blue-800",
             "Export Procedures": "bg-purple-100 text-purple-800",
@@ -76,7 +76,7 @@ export default function NewsArticlePage() {
         return colors[category] || "bg-gray-100 text-gray-800";
     };
 
-    const getYouTubeEmbedUrl = (url) => {
+    const getYouTubeEmbedUrl = (url: string): string | null => {
         if (!url) return null;
 
         // Extract video ID from various YouTube URL formats
@@ -130,7 +130,7 @@ export default function NewsArticlePage() {
         ? article.imageGalleryUrls
         : [];
 
-    const youtubeEmbedUrl = getYouTubeEmbedUrl(article.youtubeVideoUrl);
+    const youtubeEmbedUrl = article.youtubeVideoUrl ? getYouTubeEmbedUrl(article.youtubeVideoUrl) : null;
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">

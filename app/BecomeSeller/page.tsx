@@ -42,8 +42,6 @@ export default function BecomeASellerPage() {
   const uploadingFileRef = React.useRef<string | null>(null);
 
   const { startUpload } = useUploadThing("sellerDocumentUploader", {
-    // Avoid waiting for UploadThing to register metadata when their server is slow/unreachable
-    skipPolling: true, 
     onClientUploadComplete: (res) => {
       console.log("✅ Upload completed successfully:", res);
       const currentField = uploadingFileRef.current;

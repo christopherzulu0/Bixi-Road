@@ -2,6 +2,7 @@
 
 import { currentUser } from "@clerk/nextjs/server";
 import prisma  from "../prisma";
+import { Role } from "@/src/generated/prisma/client";
 
 export async function syncUser() {
   try {
@@ -15,13 +16,19 @@ export async function syncUser() {
     }
 
     // Normalize role from Clerk metadata (defaults to buyer)
-    const allowedRoles = ["admin", "seller", "buyer"] as const;
     const metadataRole = typeof user.publicMetadata?.role === "string"
       ? user.publicMetadata.role.toLowerCase()
       : undefined;
-    const normalizedRole = allowedRoles.includes(metadataRole as typeof allowedRoles[number])
-      ? metadataRole
-      : "buyer";
+    
+    // Map to Prisma Role enum
+    let normalizedRole: Role = Role.buyer;
+    if (metadataRole === "admin") {
+      normalizedRole = Role.admin;
+    } else if (metadataRole === "seller") {
+      normalizedRole = Role.seller;
+    } else if (metadataRole === "miner") {
+      normalizedRole = Role.seller; // Map miner to seller
+    }
 
     const baseData = {
       firstName: user.firstName ?? "",

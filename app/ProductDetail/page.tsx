@@ -357,7 +357,7 @@ function ProductDetailContent({ productId }: { productId: string }) {
   );
 }
 
-export default function ProductDetailPage() {
+function ProductDetailWrapper() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("id");
 
@@ -372,9 +372,13 @@ export default function ProductDetailPage() {
     );
   }
 
+  return <ProductDetailContent productId={productId} />;
+}
+
+export default function ProductDetailPage() {
   return (
     <Suspense fallback={<ProductDetailSkeleton />}>
-      <ProductDetailContent productId={productId} />
+      <ProductDetailWrapper />
     </Suspense>
   );
 }

@@ -110,10 +110,9 @@ function NewsSkeleton() {
 }
 
 function ArticlesContent({ category }: { category: string }) {
-  const { data: articles } = useQuery({
+  const { data: articles, isLoading } = useQuery({
     queryKey: ["articles", category],
     queryFn: () => fetchArticles(category),
-    suspense: true,
   })
 
   const featuredArticles = useMemo(() => (articles ?? []).filter((a) => a.featured), [articles])

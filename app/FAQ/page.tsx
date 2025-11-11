@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 
 export default function FAQPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState<string | null>(null);
 
   const faqs = [
     {
