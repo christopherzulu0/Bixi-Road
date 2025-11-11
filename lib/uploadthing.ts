@@ -5,6 +5,25 @@ import { auth } from "@clerk/nextjs/server"
 const f = createUploadthing()
 
 export const ourFileRouter = {
+    productImageUploader: f({
+        image: { maxFileSize: "8MB", maxFileCount: 1 },
+        "application/msword": { maxFileSize: "8MB" },
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+            maxFileSize: "8MB",
+        },
+    })
+        .middleware(async ({ req }) => {
+            const { userId } = await auth()
+            if (!userId) throw new UploadThingError("Unauthorized")
+            return { userId }
+        })
+        .onUploadComplete(async ({ metadata, file }) => {
+            console.log("CV uploaded for userId:", metadata.userId)
+            console.log("CV url:", file.ufsUrl)
+            return { url: file.ufsUrl }
+        }),
+
+
 
     articleImageUploader: f({
         pdf: { maxFileSize: "8MB", maxFileCount: 1 },

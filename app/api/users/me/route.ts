@@ -17,13 +17,21 @@ export async function GET() {
       );
     }
 
-    const dbUser = await prisma.user.findUnique({
-      where: { clerkId: userId },
-      select: {
-        role: true,
-        status: true,
-      },
-    });
+    const [dbUser, verifiedMinerRaw] = await Promise.all([
+      prisma.user.findUnique({
+        where: { clerkId: userId },
+        select: {
+          role: true,
+          status: true,
+        },
+      }),
+      prisma.$queryRaw<{ is_verified_miner: boolean }[]>`
+        SELECT "is_verified_miner"
+        FROM "users"
+        WHERE "clerkId" = ${userId}
+        LIMIT 1
+      `,
+    ]);
 
     if (!dbUser) {
       return NextResponse.json(
@@ -36,13 +44,17 @@ export async function GET() {
       );
     }
 
-    const role = dbUser.role ?? "USER";
+    const role = dbUser.role ?? "buyer";
     const normalizedRole = role.toLowerCase();
+    const isRoleVerifiedMiner =
+      normalizedRole === "miner" || normalizedRole === "seller";
+    const isVerifiedMiner =
+      (verifiedMinerRaw?.[0]?.is_verified_miner ?? false) || isRoleVerifiedMiner;
 
     return NextResponse.json(
       {
         role: normalizedRole,
-        isVerifiedMiner: role === "MINER" || role === "SELLER",
+        isVerifiedMiner,
         verificationStatus: dbUser.status ?? null,
       },
       { status: 200 }

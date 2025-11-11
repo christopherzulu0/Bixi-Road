@@ -1,220 +1,156 @@
 'use client'
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Search, Filter, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 import ProductCard from "@/components/marketplace/ProductCard";
 
-// Static products data
-const staticProducts = [
-  {
-    id: '1',
-    title: 'Premium Gold Nuggets',
-    description: 'High-grade gold nuggets from Ghana',
-    category: 'Gold',
-    price_per_unit: 65.50,
-    unit: 'grams',
-    quantity: 500,
-    purity_grade: '24K',
-    country: 'Ghana',
-    image_urls: ['/placeholder-gold.jpg'],
-    seller: { full_name: 'Kwame Mensah', country: 'Ghana' },
-    is_featured: true,
-    status: 'active',
-    views: 234,
-    created_date: '2024-01-15'
-  },
-  {
-    id: '2',
-    title: 'Tanzanite Gemstones',
-    description: 'Rare tanzanite stones from Tanzania',
-    category: 'Diamond',
-    price_per_unit: 1200.00,
-    unit: 'carats',
-    quantity: 25,
-    purity_grade: 'AAA',
-    country: 'Tanzania',
-    image_urls: ['/placeholder-tanzanite.jpg'],
-    seller: { full_name: 'Joseph Mwangi', country: 'Tanzania' },
-    is_featured: true,
-    status: 'active',
-    views: 189,
-    created_date: '2024-01-20'
-  },
-  {
-    id: '3',
-    title: 'Raw Diamonds',
-    description: 'Uncut diamonds from South Africa',
-    category: 'Diamond',
-    price_per_unit: 850.00,
-    unit: 'carats',
-    quantity: 15,
-    purity_grade: 'VS1',
-    country: 'South Africa',
-    image_urls: ['/placeholder-diamond.jpg'],
-    seller: { full_name: 'Sarah Johnson', country: 'South Africa' },
-    is_featured: true,
-    status: 'active',
-    views: 312,
-    created_date: '2024-01-10'
-  },
-  {
-    id: '4',
-    title: 'Copper Ore',
-    description: 'High-grade copper ore from Zambia',
-    category: 'Copper',
-    price_per_unit: 4.20,
-    unit: 'kg',
-    quantity: 1000,
-    purity_grade: '99.9%',
-    country: 'Zambia',
-    image_urls: ['/placeholder-copper.jpg'],
-    seller: { full_name: 'David Banda', country: 'Zambia' },
-    is_featured: true,
-    status: 'active',
-    views: 156,
-    created_date: '2024-01-25'
-  },
-  {
-    id: '5',
-    title: 'Emerald Crystals',
-    description: 'Natural emerald crystals from DRC',
-    category: 'Emerald',
-    price_per_unit: 450.00,
-    unit: 'carats',
-    quantity: 50,
-    purity_grade: 'AA',
-    country: 'DRC',
-    image_urls: ['/placeholder-emerald.jpg'],
-    seller: { full_name: 'Pierre Kabila', country: 'DRC' },
-    is_featured: true,
-    status: 'active',
-    views: 278,
-    created_date: '2024-01-18'
-  },
-  {
-    id: '6',
-    title: 'Silver Bars',
-    description: 'Refined silver bars from Kenya',
-    category: 'Gold',
-    price_per_unit: 28.50,
-    unit: 'grams',
-    quantity: 1000,
-    purity_grade: '99.9%',
-    country: 'Kenya',
-    image_urls: ['/placeholder-silver.jpg'],
-    seller: { full_name: 'Mary Wanjiku', country: 'Kenya' },
-    is_featured: true,
-    status: 'active',
-    views: 201,
-    created_date: '2024-01-22'
-  },
-  {
-    id: '7',
-    title: 'Ruby Gemstones',
-    description: 'Premium ruby stones from Tanzania',
-    category: 'Ruby',
-    price_per_unit: 950.00,
-    unit: 'carats',
-    quantity: 30,
-    purity_grade: 'AAA',
-    country: 'Tanzania',
-    image_urls: ['/placeholder-ruby.jpg'],
-    seller: { full_name: 'John Mwangi', country: 'Tanzania' },
-    is_featured: false,
-    status: 'active',
-    views: 145,
-    created_date: '2024-01-12'
-  },
-  {
-    id: '8',
-    title: 'Cobalt Ore',
-    description: 'High-grade cobalt ore from DRC',
-    category: 'Cobalt',
-    price_per_unit: 12.50,
-    unit: 'kg',
-    quantity: 500,
-    purity_grade: '98%',
-    country: 'DRC',
-    image_urls: ['/placeholder-cobalt.jpg'],
-    seller: { full_name: 'Jean Kabila', country: 'DRC' },
-    is_featured: false,
-    status: 'active',
-    views: 98,
-    created_date: '2024-01-28'
-  },
-  {
-    id: '9',
-    title: 'Lithium Ore',
-    description: 'Premium lithium ore from Zimbabwe',
-    category: 'Lithium',
-    price_per_unit: 8.75,
-    unit: 'kg',
-    quantity: 800,
-    purity_grade: '95%',
-    country: 'Zimbabwe',
-    image_urls: ['/placeholder-lithium.jpg'],
-    seller: { full_name: 'Robert Mugabe', country: 'Zimbabwe' },
-    is_featured: false,
-    status: 'active',
-    views: 167,
-    created_date: '2024-01-14'
-  },
-  {
-    id: '10',
-    title: 'Sapphire Gems',
-    description: 'Natural sapphire gems from Nigeria',
-    category: 'Sapphire',
-    price_per_unit: 750.00,
-    unit: 'carats',
-    quantity: 20,
-    purity_grade: 'AA',
-    country: 'Nigeria',
-    image_urls: ['/placeholder-sapphire.jpg'],
-    seller: { full_name: 'Amina Hassan', country: 'Nigeria' },
-    is_featured: false,
-    status: 'active',
-    views: 123,
-    created_date: '2024-01-19'
-  },
-  {
-    id: '11',
-    title: 'Iron Ore',
-    description: 'High-grade iron ore from Botswana',
-    category: 'Iron Ore',
-    price_per_unit: 2.50,
-    unit: 'kg',
-    quantity: 2000,
-    purity_grade: '65%',
-    country: 'Botswana',
-    image_urls: ['/placeholder-iron.jpg'],
-    seller: { full_name: 'Thabo Mbeki', country: 'Botswana' },
-    is_featured: false,
-    status: 'active',
-    views: 89,
-    created_date: '2024-01-16'
-  },
-  {
-    id: '12',
-    title: 'Coltan Ore',
-    description: 'Premium coltan ore from DRC',
-    category: 'Coltan',
-    price_per_unit: 15.00,
-    unit: 'kg',
-    quantity: 600,
-    purity_grade: '30%',
-    country: 'DRC',
-    image_urls: ['/placeholder-coltan.jpg'],
-    seller: { full_name: 'Paul Kabila', country: 'DRC' },
-    is_featured: false,
-    status: 'active',
-    views: 112,
-    created_date: '2024-01-21'
+type Product = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price_per_unit: number;
+  unit: string;
+  quantity: number;
+  purity_grade?: string;
+  country: string;
+  image_urls: string[];
+  seller: { full_name: string; country: string };
+  is_featured: boolean;
+  status: string;
+  views: number;
+  created_date: string;
+};
+
+type MarketplaceResponse = {
+  data: Product[];
+};
+
+interface ResultsCountProps {
+  categoryFilter: string;
+  countryFilter: string;
+  searchQuery: string;
+  sortBy: string;
+}
+
+function ResultsCount({
+  categoryFilter,
+  countryFilter,
+  searchQuery,
+  sortBy,
+}: ResultsCountProps) {
+  const { data } = useQuery<MarketplaceResponse>({
+    queryKey: ["marketplace", { categoryFilter, countryFilter, searchQuery, sortBy }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (categoryFilter !== "all") params.append("category", categoryFilter);
+      if (countryFilter !== "all") params.append("country", countryFilter);
+      if (searchQuery) params.append("search", searchQuery);
+      params.append("sortBy", sortBy);
+
+      const res = await fetch(`/api/marketplace?${params.toString()}`, {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("Failed to fetch products");
+      return res.json() as Promise<MarketplaceResponse>;
+    },
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+  });
+
+  const count = data?.data?.length ?? 0;
+
+  return (
+    <p className="text-gray-600">
+      <span className="font-semibold text-[#1A1A1A]">{count}</span> verified listings found
+    </p>
+  );
+}
+
+function MarketplaceSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[...Array(6)].map((_, i) => (
+        <Card key={i} className="overflow-hidden">
+          <Skeleton className="h-48 w-full" />
+          <div className="p-5 space-y-3">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-24" />
+            <div className="flex gap-2 pt-2">
+              <Skeleton className="h-8 flex-1" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function MarketplaceContent({
+  categoryFilter,
+  countryFilter,
+  searchQuery,
+  sortBy,
+}: {
+  categoryFilter: string;
+  countryFilter: string;
+  searchQuery: string;
+  sortBy: string;
+}) {
+  const { data, isLoading } = useQuery<MarketplaceResponse>({
+    queryKey: ["marketplace", { categoryFilter, countryFilter, searchQuery, sortBy }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (categoryFilter !== "all") params.append("category", categoryFilter);
+      if (countryFilter !== "all") params.append("country", countryFilter);
+      if (searchQuery) params.append("search", searchQuery);
+      params.append("sortBy", sortBy);
+
+      const res = await fetch(`/api/marketplace?${params.toString()}`, {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("Failed to fetch products");
+      return res.json() as Promise<MarketplaceResponse>;
+    },
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+  });
+
+  const products = data?.data ?? [];
+
+  if (isLoading) {
+    return <MarketplaceSkeleton />;
   }
-];
+
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-20">
+        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Search className="w-12 h-12 text-gray-400" />
+        </div>
+        <h3 className="text-2xl font-bold text-[#1A1A1A] mb-2">No listings found</h3>
+        <p className="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
 
 export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -223,52 +159,35 @@ export default function MarketplacePage() {
   const [sortBy, setSortBy] = useState("-created_date");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let filtered = staticProducts.filter(product => {
-      // Status filter
-      if (product.status !== 'active') return false;
-      
-      // Category filter
-      if (categoryFilter !== 'all' && product.category !== categoryFilter) return false;
-      
-      // Country filter
-      if (countryFilter !== 'all' && product.country !== countryFilter) return false;
-      
-      // Search filter
-      if (searchQuery !== "") {
-        const query = searchQuery.toLowerCase();
-        if (!product.title.toLowerCase().includes(query) && 
-            !product.description?.toLowerCase().includes(query)) {
-          return false;
-        }
-      }
-      
-      return true;
-    });
+  const categories = [
+    "GOLD",
+    "DIAMOND",
+    "EMERALD",
+    "RUBY",
+    "SAPPHIRE",
+    "COPPER",
+    "LITHIUM",
+    "COBALT",
+    "COLTAN",
+    "URANIUM",
+    "IRON_ORE",
+    "BAUXITE",
+    "OTHER_GEMSTONE",
+    "OTHER_MINERAL",
+  ];
 
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case '-created_date':
-          return new Date(b.created_date).getTime() - new Date(a.created_date).getTime();
-        case 'price_per_unit':
-          return a.price_per_unit - b.price_per_unit;
-        case '-price_per_unit':
-          return b.price_per_unit - a.price_per_unit;
-        case '-views':
-          return (b.views || 0) - (a.views || 0);
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [categoryFilter, countryFilter, searchQuery, sortBy]);
-
-  const categories = ["Gold", "Diamond", "Emerald", "Ruby", "Sapphire", "Copper", "Lithium", "Cobalt", "Coltan", "Uranium", "Iron Ore", "Bauxite", "Other Gemstone", "Other Mineral"];
-  
-  const countries = ["Ghana", "Kenya", "Tanzania", "Zambia", "South Africa", "DRC", "Nigeria", "Zimbabwe", "Botswana", "Mali"];
+  const countries = [
+    "Ghana",
+    "Kenya",
+    "Tanzania",
+    "Zambia",
+    "South Africa",
+    "DRC",
+    "Nigeria",
+    "Zimbabwe",
+    "Botswana",
+    "Mali",
+  ];
 
   const clearFilters = () => {
     setCategoryFilter("all");
@@ -277,7 +196,8 @@ export default function MarketplacePage() {
     setSortBy("-created_date");
   };
 
-  const hasActiveFilters = categoryFilter !== "all" || countryFilter !== "all" || searchQuery !== "";
+  const hasActiveFilters =
+    categoryFilter !== "all" || countryFilter !== "all" || searchQuery !== "";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
@@ -332,7 +252,7 @@ export default function MarketplacePage() {
           </div>
 
           {/* Filters Row */}
-          <div className={`${showFilters ? 'flex' : 'hidden'} md:flex flex-col md:flex-row gap-4`}>
+          <div className={`${showFilters ? "flex" : "hidden"} md:flex flex-col md:flex-row gap-4`}>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="flex-1 h-12 border-2 focus:border-[#D4AF37]">
                 <SelectValue placeholder="All Categories" />
@@ -340,7 +260,9 @@ export default function MarketplacePage() {
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  <SelectItem key={cat} value={cat}>
+                    {cat.replace(/_/g, " ")}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -352,7 +274,9 @@ export default function MarketplacePage() {
               <SelectContent>
                 <SelectItem value="all">All Countries</SelectItem>
                 {countries.map((country) => (
-                  <SelectItem key={country} value={country}>{country}</SelectItem>
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -372,32 +296,29 @@ export default function MarketplacePage() {
 
         {/* Results Count */}
         <div className="mb-6">
-          <p className="text-gray-600">
-            <span className="font-semibold text-[#1A1A1A]">{filteredProducts.length}</span> verified listings found
-          </p>
+          <Suspense fallback={
+            <p className="text-gray-600">
+              <span className="font-semibold text-[#1A1A1A]">Loading...</span> verified listings
+            </p>
+          }>
+            <ResultsCount
+              categoryFilter={categoryFilter}
+              countryFilter={countryFilter}
+              searchQuery={searchQuery}
+              sortBy={sortBy}
+            />
+          </Suspense>
         </div>
 
-        {/* Products Grid */}
-        {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-12 h-12 text-gray-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-[#1A1A1A] mb-2">No listings found</h3>
-            <p className="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
-            {hasActiveFilters && (
-              <Button onClick={clearFilters} className="bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A]">
-                Clear All Filters
-              </Button>
-            )}
-          </div>
-        )}
+        {/* Products Grid with Suspense */}
+        <Suspense fallback={<MarketplaceSkeleton />}>
+          <MarketplaceContent
+            categoryFilter={categoryFilter}
+            countryFilter={countryFilter}
+            searchQuery={searchQuery}
+            sortBy={sortBy}
+          />
+        </Suspense>
       </div>
     </div>
   );

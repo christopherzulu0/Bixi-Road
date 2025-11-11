@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,128 +20,228 @@ import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Static data
-const user = {
-  id: "user-1",
-  full_name: "John Miner",
-  country: "Ghana",
-  rating_average: 4.5,
-  total_reviews: 23,
-  total_sales: 15
+type MinerDashboardStats = {
+  totalListings: number;
+  activeListings: number;
+  totalViews: number;
+  totalInquiries: number;
+  totalSales: number;
+  totalRevenue: number;
+  pendingTransactions: number;
 };
 
-const products = [
-  {
-    id: "prod-1",
-    title: "Premium 24K Gold Nuggets",
-    status: "active",
-    price_per_unit: 1850,
-    unit: "grams",
-    quantity: 100,
-    views: 342,
-    image_urls: ["https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&h=300&fit=crop"]
-  },
-  {
-    id: "prod-2",
-    title: "Raw Diamond Crystals",
-    status: "pending_approval",
-    price_per_unit: 2500,
-    unit: "carats",
-    quantity: 50,
-    views: 0,
-    image_urls: ["https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&h=300&fit=crop"]
-  }
-];
+type MinerDashboardUser = {
+  id: string;
+  fullName: string;
+  country: string | null;
+  ratingAverage: number | null;
+  totalReviews: number;
+  totalSales: number;
+};
 
-const transactions = [
-  {
-    id: "txn-1",
-    product_title: "Premium 24K Gold Nuggets",
-    buyer_name: "Buyer One",
-    quantity: 2,
-    unit_price: 1850,
-    seller_receives: 3422.5,
-    escrow_status: "completed",
-    created_date: new Date(2024, 0, 15).toISOString()
-  },
-  {
-    id: "txn-2",
-    product_title: "Gold Ore",
-    buyer_name: "Buyer Two",
-    quantity: 5,
-    unit_price: 1500,
-    seller_receives: 6937.5,
-    escrow_status: "shipped",
-    created_date: new Date(2024, 0, 20).toISOString()
-  }
-];
+type MinerDashboardProduct = {
+  id: string;
+  title: string;
+  status: string;
+  pricePerUnit: number;
+  unit: string;
+  quantity: number;
+  views: number;
+  imageUrls: string[];
+  isActive: boolean;
+  approvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
 
-const inquiries = [
-  {
-    id: "inq-1",
-    product_title: "Premium 24K Gold Nuggets",
-    buyer_name: "Potential Buyer",
-    message: "What is the purity level of these nuggets?",
-    status: "pending",
-    created_date: new Date(2024, 0, 22).toISOString()
-  },
-  {
-    id: "inq-2",
-    product_title: "Raw Diamond Crystals",
-    buyer_name: "Diamond Trader",
-    message: "Do you have certificates for these?",
-    status: "responded",
-    response: "Yes, we have full certification documents.",
-    created_date: new Date(2024, 0, 18).toISOString()
-  }
-];
+type MinerDashboardResponse = {
+  data: {
+    user: MinerDashboardUser;
+    stats: MinerDashboardStats;
+    products: MinerDashboardProduct[];
+    inquiries: unknown[];
+    transactions: unknown[];
+  };
+};
 
-export default function MinerDashboardPage() {
+function MinerDashboardSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="flex flex-col md:flex-row justify-between gap-4">
+          <div className="space-y-3">
+            <Skeleton className="h-10 w-64" />
+            <Skeleton className="h-5 w-80" />
+          </div>
+          <Skeleton className="h-10 w-48" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, idx) => (
+            <Card key={idx}>
+              <CardContent className="p-6 space-y-3">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-3 w-20" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, idx) => (
+                <div key={idx} className="flex items-center gap-4">
+                  <Skeleton className="h-16 w-16 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6 space-y-6">
+            <Skeleton className="h-10 w-full" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, idx) => (
+                <Card key={idx}>
+                  <div className="h-48 bg-gray-200 animate-pulse rounded-t-lg" />
+                  <CardContent className="p-5 space-y-3">
+                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-8 w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function MinerDashboardContent() {
   const router = useRouter();
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [response, setResponse] = useState("");
 
-  const handleDeleteProduct = async (productId: string) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      alert(`Product ${productId} deleted successfully`);
+  const { data } = useQuery<MinerDashboardResponse>({
+    queryKey: ["miner", "dashboard"],
+    queryFn: async () => {
+      const res = await fetch("/api/miner/dashboard", { cache: "no-store" });
+      if (!res.ok) {
+        throw new Error("Failed to fetch miner dashboard");
+      }
+      return res.json() as Promise<MinerDashboardResponse>;
+    },
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+  });
+
+  if (!data?.data) {
+    return <MinerDashboardSkeleton />;
+  }
+
+  const dashboard = data.data;
+  const { user, stats, products } = dashboard;
+
+  type InquiryRecord = {
+    id: string;
+    productTitle: string;
+    buyerName: string;
+    message: string;
+    status: string;
+    response?: string | null;
+    createdAt: string;
+  };
+
+  type TransactionRecord = {
+    id: string;
+    productTitle: string;
+    buyerName: string;
+    quantity: number;
+    unitPrice: number;
+    sellerReceives: number;
+    escrowStatus: string;
+    createdAt: string;
+  };
+
+  const normalizedInquiries: InquiryRecord[] = Array.isArray(dashboard.inquiries)
+    ? dashboard.inquiries.map((item: any) => ({
+        id: String(item.id ?? ""),
+        productTitle: String(item.productTitle ?? item.product_title ?? "Unknown product"),
+        buyerName: String(item.buyerName ?? item.buyer_name ?? "Unknown buyer"),
+        message: String(item.message ?? ""),
+        status: String(item.status ?? "pending"),
+        response: item.response ?? null,
+        createdAt: String(item.createdAt ?? item.created_date ?? new Date().toISOString()),
+      }))
+    : [];
+
+  const normalizedTransactions: TransactionRecord[] = Array.isArray(dashboard.transactions)
+    ? dashboard.transactions.map((item: any) => ({
+        id: String(item.id ?? ""),
+        productTitle: String(item.productTitle ?? item.product_title ?? "Unknown product"),
+        buyerName: String(item.buyerName ?? item.buyer_name ?? "Unknown buyer"),
+        quantity: Number(item.quantity ?? 0),
+        unitPrice: Number(item.unitPrice ?? item.unit_price ?? 0),
+        sellerReceives: Number(item.sellerReceives ?? item.seller_receives ?? 0),
+        escrowStatus: String(item.escrowStatus ?? item.escrow_status ?? "pending"),
+        createdAt: String(item.createdAt ?? item.created_date ?? new Date().toISOString()),
+      }))
+    : [];
+
+  const pendingInquiriesCount = normalizedInquiries.filter(
+    (inquiry) => inquiry.status === "pending"
+  ).length;
+
+  const productStatusBadge = (status: string) => {
+    switch (status) {
+      case "live":
+      case "approved":
+        return "bg-green-500";
+      case "pending_review":
+      case "pending_approval":
+        return "bg-yellow-500";
+      case "sold":
+        return "bg-blue-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
-  const handleRespond = (inquiryId: string) => {
-    alert(`Response sent for inquiry ${inquiryId}`);
-    setRespondingTo(null);
-    setResponse("");
+  const handleDeleteProduct = async (productId: string) => {
+    console.info("Request to delete product", productId);
   };
 
-  const stats = {
-    totalListings: products.length,
-    activeListings: products.filter(p => p.status === 'active').length,
-    totalViews: products.reduce((sum, p) => sum + (p.views || 0), 0),
-    totalInquiries: inquiries.length,
-    totalSales: transactions.filter(t => t.escrow_status === 'completed').length,
-    totalRevenue: transactions
-      .filter(t => t.escrow_status === 'completed')
-      .reduce((sum, t) => sum + (t.seller_receives || 0), 0),
-    pendingTransactions: transactions.filter(t => ['funds_held', 'shipped'].includes(t.escrow_status)).length
+  const handleRespond = (inquiryId: string) => {
+    console.info("Responded to inquiry", inquiryId, response);
+    setRespondingTo(null);
+    setResponse("");
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-12">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-[#1A1A1A] mb-2">
-                Seller Dashboard
-              </h1>
-              <p className="text-lg text-gray-600">
-                Manage your listings and track your sales
-              </p>
+              <h1 className="text-4xl font-bold text-[#1A1A1A] mb-2">Seller Dashboard</h1>
+              <p className="text-lg text-gray-600">Manage your listings and track your sales</p>
             </div>
             <Button
-              onClick={() => router.push("/create-listing")}
+              onClick={() => router.push("/CreateListing")}
               className="bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A] font-semibold"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -150,7 +250,6 @@ export default function MinerDashboardPage() {
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <Card>
             <CardContent className="p-6">
@@ -158,8 +257,12 @@ export default function MinerDashboardPage() {
                 <span className="text-sm text-gray-600">Active Listings</span>
                 <Package className="w-5 h-5 text-[#D4AF37]" />
               </div>
-              <p className="text-3xl font-bold text-[#1A1A1A]">{stats.activeListings}</p>
-              <p className="text-xs text-gray-500 mt-1">of {stats.totalListings} total</p>
+              <p className="text-3xl font-bold text-[#1A1A1A]">
+                {stats.activeListings.toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                of {stats.totalListings.toLocaleString()} total
+              </p>
             </CardContent>
           </Card>
 
@@ -169,7 +272,9 @@ export default function MinerDashboardPage() {
                 <span className="text-sm text-gray-600">Total Views</span>
                 <Eye className="w-5 h-5 text-blue-500" />
               </div>
-              <p className="text-3xl font-bold text-[#1A1A1A]">{stats.totalViews}</p>
+              <p className="text-3xl font-bold text-[#1A1A1A]">
+                {stats.totalViews.toLocaleString()}
+              </p>
               <p className="text-xs text-gray-500 mt-1">across all listings</p>
             </CardContent>
           </Card>
@@ -180,8 +285,12 @@ export default function MinerDashboardPage() {
                 <span className="text-sm text-gray-600">Completed Sales</span>
                 <TrendingUp className="w-5 h-5 text-green-500" />
               </div>
-              <p className="text-3xl font-bold text-[#1A1A1A]">{stats.totalSales}</p>
-              <p className="text-xs text-gray-500 mt-1">{stats.pendingTransactions} pending</p>
+              <p className="text-3xl font-bold text-[#1A1A1A]">
+                {stats.totalSales.toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {stats.pendingTransactions.toLocaleString()} pending
+              </p>
             </CardContent>
           </Card>
 
@@ -199,7 +308,6 @@ export default function MinerDashboardPage() {
           </Card>
         </div>
 
-        {/* Profile Performance */}
         <Card className="mb-12">
           <CardHeader>
             <CardTitle>Your Profile Performance</CardTitle>
@@ -208,27 +316,29 @@ export default function MinerDashboardPage() {
             <div className="grid md:grid-cols-3 gap-6">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-gradient-to-br from-[#D4AF37] to-[#F4E4BC] rounded-full flex items-center justify-center text-2xl font-bold text-[#1A1A1A]">
-                  {user.full_name?.[0] || 'M'}
+                  {user.fullName?.[0] || "M"}
                 </div>
                 <div>
-                  <p className="font-bold text-[#1A1A1A]">{user.full_name}</p>
-                  <p className="text-sm text-gray-600">{user.country}</p>
+                  <p className="font-bold text-[#1A1A1A]">{user.fullName}</p>
+                  <p className="text-sm text-gray-600">{user.country ?? "Unknown"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Star className="w-8 h-8 fill-[#D4AF37] text-[#D4AF37]" />
                 <div>
                   <p className="text-2xl font-bold text-[#1A1A1A]">
-                    {user.rating_average?.toFixed(1) || '0.0'}
+                    {(user.ratingAverage ?? 0).toFixed(1)}
                   </p>
-                  <p className="text-sm text-gray-600">{user.total_reviews || 0} reviews</p>
+                  <p className="text-sm text-gray-600">
+                    {user.totalReviews.toLocaleString()} reviews
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Users className="w-8 h-8 text-[#D4AF37]" />
                 <div>
                   <p className="text-2xl font-bold text-[#1A1A1A]">
-                    {user.total_sales || 0}
+                    {user.totalSales.toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-600">successful sales</p>
                 </div>
@@ -237,17 +347,13 @@ export default function MinerDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Tabs for different sections */}
         <Tabs defaultValue="listings" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="listings">My Listings ({products.length})</TabsTrigger>
-            <TabsTrigger value="inquiries">
-              Inquiries ({inquiries.filter(i => i.status === 'pending').length})
-            </TabsTrigger>
-            <TabsTrigger value="transactions">Transactions ({transactions.length})</TabsTrigger>
+            <TabsTrigger value="inquiries">Inquiries ({pendingInquiriesCount})</TabsTrigger>
+            <TabsTrigger value="transactions">Transactions ({normalizedTransactions.length})</TabsTrigger>
           </TabsList>
 
-          {/* Listings Tab */}
           <TabsContent value="listings">
             <h2 className="text-2xl font-bold text-[#1A1A1A] mb-6">My Listings</h2>
 
@@ -257,17 +363,16 @@ export default function MinerDashboardPage() {
                   <Card key={product.id} className="hover:shadow-lg transition-shadow">
                     <div className="relative h-48 overflow-hidden">
                       <img
-                        src={product.image_urls?.[0] || "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&h=300&fit=crop"}
+                        src={
+                          product.imageUrls?.[0] ||
+                          "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&h=300&fit=crop"
+                        }
                         alt={product.title}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute top-3 left-3">
-                        <Badge className={
-                          product.status === 'active' ? 'bg-green-500' :
-                            product.status === 'pending_approval' ? 'bg-yellow-500' :
-                              'bg-gray-500'
-                        }>
-                          {product.status.replace(/_/g, ' ').toUpperCase()}
+                        <Badge className={productStatusBadge(product.status)}>
+                          {product.status.replace(/_/g, " ").toUpperCase()}
                         </Badge>
                       </div>
                     </div>
@@ -279,23 +384,25 @@ export default function MinerDashboardPage() {
                         <div className="flex justify-between">
                           <span>Price:</span>
                           <span className="font-semibold text-[#D4AF37]">
-                            ${product.price_per_unit}/{product.unit}
+                            ${product.pricePerUnit}/{product.unit}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Quantity:</span>
-                          <span className="font-semibold">{product.quantity} {product.unit}</span>
+                          <span className="font-semibold">
+                            {product.quantity} {product.unit}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Views:</span>
-                          <span className="font-semibold">{product.views || 0}</span>
+                          <span className="font-semibold">{product.views.toLocaleString()}</span>
                         </div>
                       </div>
                       <div className="flex gap-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => router.push(`/edit-listing?id=${product.id}`)}
+                          onClick={() => router.push(`/MinerProfile/${product.id}`)}
                           className="flex-1"
                         >
                           <Edit className="w-4 h-4 mr-1" />
@@ -315,12 +422,12 @@ export default function MinerDashboardPage() {
                 ))}
               </div>
             ) : (
-                  <Card className="p-12 text-center">
+              <Card className="p-12 text-center">
                 <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">No listings yet</h3>
                 <p className="text-gray-600 mb-6">Create your first listing to start selling</p>
                 <Button
-                  onClick={() => router.push("/create-listing")}
+                  onClick={() => router.push("/CreateListing")}
                   className="bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A]"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -330,29 +437,41 @@ export default function MinerDashboardPage() {
             )}
           </TabsContent>
 
-          {/* Inquiries Tab */}
           <TabsContent value="inquiries">
             <h2 className="text-2xl font-bold text-[#1A1A1A] mb-6">Product Inquiries</h2>
 
-            {inquiries.length > 0 ? (
+            {normalizedInquiries.length > 0 ? (
               <div className="space-y-4">
-                {inquiries.map((inquiry) => (
-                  <Card key={inquiry.id} className={inquiry.status === 'pending' ? 'border-2 border-yellow-300' : ''}>
+                {normalizedInquiries.map((inquiry) => (
+                  <Card
+                    key={inquiry.id}
+                    className={
+                      inquiry.status === "pending" ? "border-2 border-yellow-300" : ""
+                    }
+                  >
                     <CardContent className="p-6">
                       <div className="flex flex-col md:flex-row justify-between items-start mb-4">
                         <div>
-                          <h3 className="font-bold text-[#1A1A1A] mb-1">{inquiry.product_title}</h3>
+                          <h3 className="font-bold text-[#1A1A1A] mb-1">
+                            {inquiry.productTitle}
+                          </h3>
                           <p className="text-sm text-gray-600">
-                            From: <span className="font-medium">{inquiry.buyer_name}</span>
+                            From: <span className="font-medium">{inquiry.buyerName}</span>
                           </p>
-                          <p className="text-xs text-gray-500">{format(new Date(inquiry.created_date), "MMM d, yyyy 'at' h:mm a")}</p>
+                          <p className="text-xs text-gray-500">
+                            {format(new Date(inquiry.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                          </p>
                         </div>
-                        <Badge className={
-                          inquiry.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            inquiry.status === 'responded' ? 'bg-green-100 text-green-800' :
-                              'bg-gray-100 text-gray-800'
-                        }>
-                          {inquiry.status.replace('_', ' ')}
+                        <Badge
+                          className={
+                            inquiry.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : inquiry.status === "responded"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }
+                        >
+                          {inquiry.status.replace("_", " ")}
                         </Badge>
                       </div>
 
@@ -363,7 +482,9 @@ export default function MinerDashboardPage() {
 
                       {inquiry.response ? (
                         <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                          <p className="text-sm font-semibold text-green-900 mb-1">Your Response:</p>
+                          <p className="text-sm font-semibold text-green-900 mb-1">
+                            Your Response:
+                          </p>
                           <p className="text-green-800">{inquiry.response}</p>
                         </div>
                       ) : respondingTo === inquiry.id ? (
@@ -416,36 +537,45 @@ export default function MinerDashboardPage() {
             )}
           </TabsContent>
 
-          {/* Transactions Tab */}
           <TabsContent value="transactions">
             <h2 className="text-2xl font-bold text-[#1A1A1A] mb-6">Recent Transactions</h2>
 
-            {transactions.length > 0 ? (
+            {normalizedTransactions.length > 0 ? (
               <div className="space-y-4">
-                {transactions.slice(0, 5).map((transaction) => (
+                {normalizedTransactions.slice(0, 5).map((transaction) => (
                   <Card key={transaction.id}>
                     <CardContent className="p-6">
                       <div className="flex flex-col md:flex-row justify-between gap-4">
                         <div>
                           <h3 className="font-bold text-[#1A1A1A] mb-2">
-                            {transaction.product_title}
+                            {transaction.productTitle}
                           </h3>
                           <div className="space-y-1 text-sm text-gray-600">
-                            <p>Buyer: <span className="font-medium">{transaction.buyer_name}</span></p>
-                            <p>Quantity: {transaction.quantity} @ ${transaction.unit_price}</p>
-                            <p>Date: {format(new Date(transaction.created_date), "MMM d, yyyy")}</p>
+                            <p>
+                              Buyer: <span className="font-medium">{transaction.buyerName}</span>
+                            </p>
+                            <p>
+                              Quantity: {transaction.quantity} @ ${transaction.unitPrice}
+                            </p>
+                            <p>
+                              Date: {format(new Date(transaction.createdAt), "MMM d, yyyy")}
+                            </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <Badge className={
-                            transaction.escrow_status === 'completed' ? 'bg-green-100 text-green-800' :
-                              transaction.escrow_status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                                'bg-yellow-100 text-yellow-800'
-                          }>
-                            {transaction.escrow_status.replace(/_/g, ' ')}
+                          <Badge
+                            className={
+                              transaction.escrowStatus === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : transaction.escrowStatus === "shipped"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }
+                          >
+                            {transaction.escrowStatus.replace(/_/g, " ")}
                           </Badge>
                           <p className="text-2xl font-bold text-[#D4AF37] mt-2">
-                            ${transaction.seller_receives?.toLocaleString()}
+                            ${transaction.sellerReceives.toLocaleString()}
                           </p>
                           <p className="text-xs text-gray-500">you receive</p>
                         </div>
@@ -465,5 +595,13 @@ export default function MinerDashboardPage() {
         </Tabs>
       </div>
     </div>
+  );
+}
+
+export default function MinerDashboardPage() {
+  return (
+    <Suspense fallback={<MinerDashboardSkeleton />}>
+      <MinerDashboardContent />
+    </Suspense>
   );
 }

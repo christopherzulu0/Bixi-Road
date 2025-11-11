@@ -22,7 +22,7 @@ export default function ProductCard({ product }) {
     `https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&h=300&fit=crop`;
 
   return (
-    <Link href={`/product-detail?id=${product.id}`}>
+    <Link href={`/ProductDetail?id=${product.id}`}>
       <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-[#D4AF37] h-full">
         <div className="relative overflow-hidden aspect-[4/3]">
           <img

@@ -53,7 +53,14 @@ export async function POST(req: Request) {
     }
 
     // Check if user is a verified miner/seller
-    if (user.role !== "MINER" && user.role !== "SELLER" && user.role !== "ADMIN") {
+    const normalizedRole = (user.role ?? "").toLowerCase();
+    const isAuthorized =
+      user.isVerifiedMiner ||
+      normalizedRole === "miner" ||
+      normalizedRole === "seller" ||
+      normalizedRole === "admin";
+
+    if (!isAuthorized) {
       return new NextResponse(
         JSON.stringify({
           error: "Forbidden - Only verified miners/sellers can create listings",

@@ -46,6 +46,7 @@ export type UserMinAggregateOutputType = {
   EmergencyContactNumber: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  isVerifiedMiner: boolean | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -70,6 +71,7 @@ export type UserMaxAggregateOutputType = {
   EmergencyContactNumber: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  isVerifiedMiner: boolean | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -94,6 +96,7 @@ export type UserCountAggregateOutputType = {
   EmergencyContactNumber: number
   createdAt: number
   updatedAt: number
+  isVerifiedMiner: number
   _all: number
 }
 
@@ -120,6 +123,7 @@ export type UserMinAggregateInputType = {
   EmergencyContactNumber?: true
   createdAt?: true
   updatedAt?: true
+  isVerifiedMiner?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -144,6 +148,7 @@ export type UserMaxAggregateInputType = {
   EmergencyContactNumber?: true
   createdAt?: true
   updatedAt?: true
+  isVerifiedMiner?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -168,6 +173,7 @@ export type UserCountAggregateInputType = {
   EmergencyContactNumber?: true
   createdAt?: true
   updatedAt?: true
+  isVerifiedMiner?: true
   _all?: true
 }
 
@@ -265,6 +271,7 @@ export type UserGroupByOutputType = {
   EmergencyContactNumber: string | null
   createdAt: Date
   updatedAt: Date
+  isVerifiedMiner: boolean
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -310,6 +317,7 @@ export type UserWhereInput = {
   EmergencyContactNumber?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  isVerifiedMiner?: Prisma.BoolFilter<"User"> | boolean
   sellerApplications?: Prisma.SellerApplicationListRelationFilter
   articles?: Prisma.ArticleListRelationFilter
   productListings?: Prisma.ProductListingListRelationFilter
@@ -337,6 +345,7 @@ export type UserOrderByWithRelationInput = {
   EmergencyContactNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isVerifiedMiner?: Prisma.SortOrder
   sellerApplications?: Prisma.SellerApplicationOrderByRelationAggregateInput
   articles?: Prisma.ArticleOrderByRelationAggregateInput
   productListings?: Prisma.ProductListingOrderByRelationAggregateInput
@@ -367,6 +376,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   EmergencyContactNumber?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  isVerifiedMiner?: Prisma.BoolFilter<"User"> | boolean
   sellerApplications?: Prisma.SellerApplicationListRelationFilter
   articles?: Prisma.ArticleListRelationFilter
   productListings?: Prisma.ProductListingListRelationFilter
@@ -394,6 +404,7 @@ export type UserOrderByWithAggregationInput = {
   EmergencyContactNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isVerifiedMiner?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -424,6 +435,7 @@ export type UserScalarWhereWithAggregatesInput = {
   EmergencyContactNumber?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  isVerifiedMiner?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
 }
 
 export type UserCreateInput = {
@@ -448,6 +460,7 @@ export type UserCreateInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
@@ -475,6 +488,7 @@ export type UserUncheckedCreateInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
@@ -502,6 +516,7 @@ export type UserUpdateInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
@@ -529,6 +544,7 @@ export type UserUncheckedUpdateInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
@@ -556,6 +572,7 @@ export type UserCreateManyInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
 }
 
 export type UserUpdateManyMutationInput = {
@@ -580,6 +597,7 @@ export type UserUpdateManyMutationInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -604,6 +622,7 @@ export type UserUncheckedUpdateManyInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -628,6 +647,7 @@ export type UserCountOrderByAggregateInput = {
   EmergencyContactNumber?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isVerifiedMiner?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -652,6 +672,7 @@ export type UserMaxOrderByAggregateInput = {
   EmergencyContactNumber?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isVerifiedMiner?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -676,6 +697,7 @@ export type UserMinOrderByAggregateInput = {
   EmergencyContactNumber?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isVerifiedMiner?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -705,6 +727,10 @@ export type EnumRoleFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type UserCreateNestedOneWithoutSellerApplicationsInput = {
@@ -771,6 +797,7 @@ export type UserCreateWithoutSellerApplicationsInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
 }
@@ -797,6 +824,7 @@ export type UserUncheckedCreateWithoutSellerApplicationsInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
 }
@@ -839,6 +867,7 @@ export type UserUpdateWithoutSellerApplicationsInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
 }
@@ -865,6 +894,7 @@ export type UserUncheckedUpdateWithoutSellerApplicationsInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
 }
@@ -891,6 +921,7 @@ export type UserCreateWithoutArticlesInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
   productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
 }
@@ -917,6 +948,7 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
   productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
 }
@@ -959,6 +991,7 @@ export type UserUpdateWithoutArticlesInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
   productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
 }
@@ -985,6 +1018,7 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
   productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
 }
@@ -1011,6 +1045,7 @@ export type UserCreateWithoutProductListingsInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
 }
@@ -1037,6 +1072,7 @@ export type UserUncheckedCreateWithoutProductListingsInput = {
   EmergencyContactNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
 }
@@ -1079,6 +1115,7 @@ export type UserUpdateWithoutProductListingsInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
 }
@@ -1105,6 +1142,7 @@ export type UserUncheckedUpdateWithoutProductListingsInput = {
   EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
 }
@@ -1180,6 +1218,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   EmergencyContactNumber?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isVerifiedMiner?: boolean
   sellerApplications?: boolean | Prisma.User$sellerApplicationsArgs<ExtArgs>
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   productListings?: boolean | Prisma.User$productListingsArgs<ExtArgs>
@@ -1208,6 +1247,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   EmergencyContactNumber?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isVerifiedMiner?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1232,6 +1272,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   EmergencyContactNumber?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isVerifiedMiner?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1256,9 +1297,10 @@ export type UserSelectScalar = {
   EmergencyContactNumber?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isVerifiedMiner?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "clerkId" | "firstName" | "lastName" | "dateOfBirth" | "gender" | "nationality" | "phone" | "address" | "city" | "state" | "zipCode" | "country" | "bio" | "role" | "status" | "EmergencyContactName" | "EmergencyContactNumber" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "clerkId" | "firstName" | "lastName" | "dateOfBirth" | "gender" | "nationality" | "phone" | "address" | "city" | "state" | "zipCode" | "country" | "bio" | "role" | "status" | "EmergencyContactName" | "EmergencyContactNumber" | "createdAt" | "updatedAt" | "isVerifiedMiner", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sellerApplications?: boolean | Prisma.User$sellerApplicationsArgs<ExtArgs>
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
@@ -1297,6 +1339,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     EmergencyContactNumber: string | null
     createdAt: Date
     updatedAt: Date
+    isVerifiedMiner: boolean
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1744,6 +1787,7 @@ export interface UserFieldRefs {
   readonly EmergencyContactNumber: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly isVerifiedMiner: Prisma.FieldRef<"User", 'Boolean'>
 }
     
 

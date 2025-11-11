@@ -92,7 +92,8 @@ export const UserScalarFieldEnum = {
   EmergencyContactName: 'EmergencyContactName',
   EmergencyContactNumber: 'EmergencyContactNumber',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isVerifiedMiner: 'isVerifiedMiner'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]

@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
+import {
   Users, 
   Package, 
   DollarSign, 
@@ -21,59 +21,123 @@ import {
 import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-// Static data
-const allUsers = [
-  {
-    id: "user-1",
-    full_name: "John Miner",
-    email: "john@example.com",
-    country: "Ghana",
-    phone: "+233 123 456 789",
-    mine_location: "Ashanti Region",
-    bio: "Experienced gold miner with 15 years in the industry",
-    verification_status: "pending",
-    is_verified_miner: false,
-    mining_license_url: "https://example.com/license.pdf",
-    id_document_url: "https://example.com/id.pdf",
-    company_cert_url: null
-  },
-  {
-    id: "user-2",
-    full_name: "Jane Trader",
-    email: "jane@example.com",
-    country: "Kenya",
-    phone: "+254 987 654 321",
-    mine_location: "Nairobi",
-    bio: "Diamond trader specializing in export",
-    verification_status: "approved",
-    is_verified_miner: true
-  }
-];
+type PendingVerification = {
+  id: string;
+  full_name: string;
+  email: string;
+  country?: string;
+  phone?: string;
+  mine_location?: string;
+  bio?: string;
+  mining_license_url?: string;
+  id_document_url?: string;
+  company_cert_url?: string;
+};
 
-const allProducts = [
-  {
-    id: "prod-1",
-    title: "Premium Gold Nuggets",
-    category: "Gold",
-    seller_name: "John Miner",
-    price_per_unit: 1850,
-    unit: "grams",
-    quantity: 100,
-    status: "pending_approval"
-  },
-  {
-    id: "prod-2",
-    title: "Raw Diamonds",
-    category: "Diamond",
-    seller_name: "Jane Trader",
-    price_per_unit: 2500,
-    unit: "carats",
-    quantity: 50,
-    status: "active",
-    image_urls: ["https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&h=300&fit=crop"]
-  }
-];
+type PendingProduct = {
+  id: string;
+  title: string;
+  category?: string;
+  seller_name?: string;
+  price_per_unit?: number;
+  unit?: string;
+  quantity?: number;
+  country?: string;
+  image_urls?: string[];
+};
+
+type ApiResponse<T> = {
+  data: T[];
+};
+
+type DialogState =
+  | { type: "approve_user"; entity: PendingVerification }
+  | { type: "reject_user"; entity: PendingVerification }
+  | { type: "approve_product"; entity: PendingProduct }
+  | { type: "reject_product"; entity: PendingProduct };
+
+type DashboardStats = {
+  totalUsers: number;
+  verifiedMiners: number;
+  pendingVerifications: number;
+  totalListings: number;
+  activeListings: number;
+  pendingListings: number;
+};
+
+type DashboardStatsResponse = {
+  data: DashboardStats;
+};
+
+function VerificationsSkeleton() {
+  return (
+    <div className="space-y-4">
+      {[...Array(3)].map((_, i) => (
+        <Card key={i} className="border-2">
+          <CardContent className="p-6">
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="flex-1 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="h-4 w-56 mt-2" />
+                  </div>
+                  <Skeleton className="h-6 w-24" />
+                </div>
+                <div className="grid md:grid-cols-2 gap-3 text-sm">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-64 md:col-span-2" />
+                  <Skeleton className="h-16 w-full md:col-span-2" />
+                </div>
+              </div>
+              <div className="flex lg:flex-col gap-3 lg:w-40">
+                <Skeleton className="h-9 w-full" />
+                <Skeleton className="h-9 w-full" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function ProductsSkeleton() {
+  return (
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[...Array(6)].map((_, i) => (
+        <Card key={i} className="border-2">
+          <Skeleton className="h-48 w-full" />
+          <CardContent className="p-5 space-y-2">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-36" />
+            <div className="flex gap-2 pt-2">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-10" />
+            </div>
+            <Skeleton className="h-8 w-full" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
 
 const allTransactions = [
   {
@@ -104,43 +168,230 @@ const allTransactions = [
 
 export default function AdminDashboardPage() {
   const navigate = useRouter();
+  const queryClient = useQueryClient();
   const [countryFilter, setCountryFilter] = useState("all");
+  const [dialogState, setDialogState] = useState<DialogState | null>(null);
+  const [dialogLoading, setDialogLoading] = useState(false);
 
-  const filteredUsers = countryFilter === "all" 
-    ? allUsers 
-    : allUsers.filter(u => u.country === countryFilter);
+  const {
+    data: verificationsData,
+    isLoading: verificationsLoading,
+  } = useQuery<ApiResponse<PendingVerification>>({
+    queryKey: ["admin", "pending-verifications"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/pending-verifications");
+      if (!res.ok) throw new Error("Failed to fetch pending verifications");
+      const data = (await res.json()) as ApiResponse<PendingVerification>;
+      return data;
+    },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+  });
+
+  const {
+    data: productsData,
+    isLoading: productsLoading,
+  } = useQuery<ApiResponse<PendingProduct>>({
+    queryKey: ["admin", "pending-products"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/pending-products");
+      if (!res.ok) throw new Error("Failed to fetch pending products");
+      const data = (await res.json()) as ApiResponse<PendingProduct>;
+      return data;
+    },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+  });
+
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+  } = useQuery<DashboardStatsResponse>({
+    queryKey: ["admin", "dashboard-stats"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/dashboard-stats");
+      if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+      return res.json() as Promise<DashboardStatsResponse>;
+    },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchInterval: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+  });
+
+  const allUsersApi = verificationsData?.data ?? [];
+  const allProductsApi = productsData?.data ?? [];
+
+  const filteredUsers = countryFilter === "all"
+    ? allUsersApi
+    : allUsersApi.filter((u) => u.country === countryFilter);
 
   const filteredProducts = countryFilter === "all"
-    ? allProducts
-    : allProducts.filter(p => p.country === countryFilter);
+    ? allProductsApi
+    : allProductsApi.filter((p) => p.country === countryFilter);
 
-  const pendingVerifications = filteredUsers.filter(u => u.verification_status === 'pending');
-  const pendingProducts = filteredProducts.filter(p => p.status === 'pending_approval');
+  const pendingVerifications = filteredUsers; // API already returns only pending
+  const pendingProducts = filteredProducts; // API already returns only pending
 
-  const handleApproveUser = async (userId) => {
-    alert(`User ${userId} approved successfully`);
+  const approveUserMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/seller-applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "approve" }),
+      });
+      if (!res.ok) throw new Error("Failed to approve user");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "pending-verifications"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard-stats"] });
+    },
+  });
+
+  const rejectUserMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/seller-applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reject" }),
+      });
+      if (!res.ok) throw new Error("Failed to reject user");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "pending-verifications"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard-stats"] });
+    },
+  });
+
+  const approveProductMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/product-listings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "approve" }),
+      });
+      if (!res.ok) throw new Error("Failed to approve product");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "pending-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard-stats"] });
+    },
+  });
+
+  const rejectProductMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/product-listings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reject" }),
+      });
+      if (!res.ok) throw new Error("Failed to reject product");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "pending-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard-stats"] });
+    },
+  });
+
+  const handleApproveUser = async (userId: string) => {
+    await approveUserMutation.mutateAsync(userId);
   };
 
-  const handleRejectUser = async (userId) => {
-    alert(`User ${userId} rejected`);
+  const handleRejectUser = async (userId: string) => {
+    await rejectUserMutation.mutateAsync(userId);
   };
 
-  const handleApproveProduct = async (productId) => {
-    alert(`Product ${productId} approved successfully`);
+  const handleApproveProduct = async (productId: string) => {
+    await approveProductMutation.mutateAsync(productId);
   };
 
-  const handleRejectProduct = async (productId) => {
-    alert(`Product ${productId} rejected`);
+  const handleRejectProduct = async (productId: string) => {
+    await rejectProductMutation.mutateAsync(productId);
   };
 
-  // Calculate stats
+  const handleDialogConfirm = async () => {
+    if (!dialogState) return;
+    setDialogLoading(true);
+    try {
+      if (dialogState.type === "approve_user") {
+        await handleApproveUser(dialogState.entity.id);
+      } else if (dialogState.type === "reject_user") {
+        await handleRejectUser(dialogState.entity.id);
+      } else if (dialogState.type === "approve_product") {
+        await handleApproveProduct(dialogState.entity.id);
+      } else if (dialogState.type === "reject_product") {
+        await handleRejectProduct(dialogState.entity.id);
+      }
+      setDialogState(null);
+    } catch (error) {
+      console.error("Failed to perform action", error);
+    } finally {
+      setDialogLoading(false);
+    }
+  };
+
+  const closeDialog = () => {
+    if (dialogLoading) return;
+    setDialogState(null);
+  };
+
+  const dialogDetails = useMemo(() => {
+    if (!dialogState) return null;
+    switch (dialogState.type) {
+      case "approve_user":
+        return {
+          title: "Approve Seller Application",
+          description: `Are you sure you want to approve seller ${dialogState.entity.full_name}?`,
+          confirmLabel: "Approve",
+          confirmClass: "bg-green-600 hover:bg-green-700",
+        };
+      case "reject_user":
+        return {
+          title: "Reject Seller Application",
+          description: `Are you sure you want to reject seller ${dialogState.entity.full_name}?`,
+          confirmLabel: "Reject",
+          confirmClass: "bg-red-600 hover:bg-red-700",
+        };
+      case "approve_product":
+        return {
+          title: "Approve Product Listing",
+          description: `Are you sure you want to approve product "${dialogState.entity.title}"?`,
+          confirmLabel: "Approve",
+          confirmClass: "bg-green-600 hover:bg-green-700",
+        };
+      case "reject_product":
+        return {
+          title: "Reject Product Listing",
+          description: `Are you sure you want to reject product "${dialogState.entity.title}"?`,
+          confirmLabel: "Reject",
+          confirmClass: "bg-red-600 hover:bg-red-700",
+        };
+      default:
+        return null;
+    }
+  }, [dialogState]);
+
+  // Calculate stats (based on available API data)
+  const statsFromApi = statsData?.data;
+
   const stats = {
-    totalUsers: filteredUsers.length,
-    verifiedMiners: filteredUsers.filter(u => u.is_verified_miner).length,
-    pendingVerifications: pendingVerifications.length,
-    totalListings: filteredProducts.length,
-    activeListings: filteredProducts.filter(p => p.status === 'active').length,
-    pendingListings: pendingProducts.length,
+    totalUsers: statsFromApi?.totalUsers ?? 0,
+    verifiedMiners: statsFromApi?.verifiedMiners ?? 0,
+    pendingVerifications: statsFromApi?.pendingVerifications ?? pendingVerifications.length,
+    totalListings: statsFromApi?.totalListings ?? 0,
+    activeListings: statsFromApi?.activeListings ?? 0,
+    pendingListings: statsFromApi?.pendingListings ?? pendingProducts.length,
     totalTransactions: allTransactions.length,
     completedTransactions: allTransactions.filter(t => t.escrow_status === 'completed').length,
     totalRevenue: allTransactions
@@ -151,8 +402,17 @@ export default function AdminDashboardPage() {
       .reduce((sum, t) => sum + (t.commission_amount || 0), 0)
   };
 
-  // Get unique countries
-  const countries = ["all", ...new Set(allUsers.map(u => u.country).filter(Boolean))];
+  // Get unique countries from API data
+  const countries = useMemo(() => {
+    const uniqueCountries = Array.from(
+      new Set(
+        allUsersApi
+          .map((u) => u.country)
+          .filter((country): country is string => Boolean(country))
+      )
+    );
+    return ["all", ...uniqueCountries];
+  }, [allUsersApi]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
@@ -215,8 +475,22 @@ export default function AdminDashboardPage() {
                 <span className="text-sm text-gray-600">Total Users</span>
                 <Users className="w-5 h-5 text-[#D4AF37]" />
               </div>
-              <p className="text-3xl font-bold text-[#1A1A1A]">{stats.totalUsers}</p>
-              <p className="text-xs text-gray-500 mt-1">{stats.verifiedMiners} verified miners</p>
+              {statsLoading ? (
+                <div className="text-3xl font-bold text-[#1A1A1A]">
+                  <Skeleton className="h-8 w-24" />
+                </div>
+              ) : (
+                <p className="text-3xl font-bold text-[#1A1A1A]">
+                  {stats.totalUsers.toLocaleString()}
+                </p>
+              )}
+              <div className="text-xs text-gray-500 mt-1">
+                {statsLoading ? (
+                  <Skeleton className="h-3 w-24" />
+                ) : (
+                  <span>{`${stats.verifiedMiners.toLocaleString()} verified miners`}</span>
+                )}
+              </div>
             </CardContent>
           </Card>
           
@@ -226,8 +500,22 @@ export default function AdminDashboardPage() {
                 <span className="text-sm text-gray-600">Active Listings</span>
                 <Package className="w-5 h-5 text-blue-500" />
               </div>
-              <p className="text-3xl font-bold text-[#1A1A1A]">{stats.activeListings}</p>
-              <p className="text-xs text-gray-500 mt-1">of {stats.totalListings} total</p>
+              {statsLoading ? (
+                <div className="text-3xl font-bold text-[#1A1A1A]">
+                  <Skeleton className="h-8 w-24" />
+                </div>
+              ) : (
+                <p className="text-3xl font-bold text-[#1A1A1A]">
+                  {stats.activeListings.toLocaleString()}
+                </p>
+              )}
+              <div className="text-xs text-gray-500 mt-1">
+                {statsLoading ? (
+                  <Skeleton className="h-3 w-28" />
+                ) : (
+                  <span>{`of ${stats.totalListings.toLocaleString()} total`}</span>
+                )}
+              </div>
             </CardContent>
           </Card>
           
@@ -283,7 +571,9 @@ export default function AdminDashboardPage() {
                 <CardTitle>Pending Seller Verifications</CardTitle>
               </CardHeader>
               <CardContent>
-                {pendingVerifications.length > 0 ? (
+                {verificationsLoading ? (
+                  <VerificationsSkeleton />
+                ) : pendingVerifications.length > 0 ? (
                   <div className="space-y-4">
                     {pendingVerifications.map((user) => (
                       <Card key={user.id} className="border-2">
@@ -352,14 +642,14 @@ export default function AdminDashboardPage() {
 
                             <div className="flex lg:flex-col gap-3 lg:w-40">
                               <Button
-                                onClick={() => handleApproveUser(user.id)}
+                                  onClick={() => setDialogState({ type: "approve_user", entity: user })}
                                 className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                               >
                                 <CheckCircle className="w-4 h-4 mr-2" />
                                 Approve
                               </Button>
                               <Button
-                                onClick={() => handleRejectUser(user.id)}
+                                  onClick={() => setDialogState({ type: "reject_user", entity: user })}
                                 variant="outline"
                                 className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
                               >
@@ -389,7 +679,9 @@ export default function AdminDashboardPage() {
                 <CardTitle>Pending Product Approvals</CardTitle>
               </CardHeader>
               <CardContent>
-                {pendingProducts.length > 0 ? (
+                {productsLoading ? (
+                  <ProductsSkeleton />
+                ) : pendingProducts.length > 0 ? (
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pendingProducts.map((product) => (
                       <Card key={product.id} className="border-2">
@@ -416,7 +708,7 @@ export default function AdminDashboardPage() {
                           <div className="flex gap-2">
                             <Button
                               size="sm"
-                              onClick={() => handleApproveProduct(product.id)}
+                              onClick={() => setDialogState({ type: "approve_product", entity: product })}
                               className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                             >
                               <CheckCircle className="w-4 h-4 mr-1" />
@@ -425,7 +717,7 @@ export default function AdminDashboardPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleRejectProduct(product.id)}
+                              onClick={() => setDialogState({ type: "reject_product", entity: product })}
                               className="text-red-600"
                             >
                               <X className="w-4 h-4" />
@@ -434,7 +726,7 @@ export default function AdminDashboardPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            // onClick={() => navigate(`${createPageUrl("ProductDetail")}?id=${product.id}`)}
+                              onClick={() => navigate.push(`/PorductDetail?id=${product.id}`)}
                             className="w-full mt-2"
                           >
                             <Eye className="w-4 h-4 mr-2" />
@@ -508,6 +800,26 @@ export default function AdminDashboardPage() {
           </TabsContent>
         </Tabs>
       </div>
+      <AlertDialog open={Boolean(dialogState)} onOpenChange={(open) => (open ? null : closeDialog())}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dialogDetails?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{dialogDetails?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={closeDialog} disabled={dialogLoading}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDialogConfirm}
+              className={dialogDetails?.confirmClass}
+              disabled={dialogLoading}
+            >
+              {dialogLoading ? "Processing..." : dialogDetails?.confirmLabel}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

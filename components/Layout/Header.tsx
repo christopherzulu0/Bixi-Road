@@ -110,38 +110,42 @@ export default function Header() {
   const isVerifiedMiner = profile.isVerifiedMiner;
   const verificationStatus = profile.verificationStatus;
 
+  const ready = mounted && isLoaded;
+
   const getDashboardUrl = () => {
     if (!isSignedIn) return "/";
-    if (role === "admin") return "/AdminDashboard";
+    const normalizedRole = (role ?? "").toLowerCase();
+    if (normalizedRole === "admin") return "/AdminDashboard";
     if (isVerifiedMiner) return "/MinerDashboard";
     return "/BuyerDashboard";
   };
 
   const navItems = useMemo(() => {
     const items = [
-      { name: "Marketplace", path: "/marketplace", icon: ShoppingBag },
-      { name: "Market News", path: "/news", icon: Newspaper },
-      { name: "How It Works", path: "/how-it-works", icon: Info },
+      { name: "Marketplace", path: "/MarketPlace", icon: ShoppingBag },
+      { name: "Market News", path: "/News", icon: Newspaper },
+      { name: "How It Works", path: "/HowItWorks", icon: Info },
     ];
 
-    if (isSignedIn) {
+    if (isSignedIn && ready) {
+      const normalizedRole = (role ?? "").toLowerCase();
       items.push({
-        name: role === "admin" ? "Admin" : "Dashboard",
+        name: normalizedRole === "admin" ? "Admin" : "Dashboard",
         path: getDashboardUrl(),
         icon: LayoutDashboard,
       });
 
-      if (!isVerifiedMiner && role !== "admin" && verificationStatus !== "pending") {
+      if (!isVerifiedMiner && normalizedRole !== "admin" && verificationStatus !== "pending") {
         items.push({
           name: "Become a Seller",
-          path: "/become-seller",
+          path: "/BecomeSeller",
           icon: Shield,
         });
       }
     }
 
     return items;
-  }, [isSignedIn, role, isVerifiedMiner, verificationStatus]);
+  }, [isSignedIn, role, isVerifiedMiner, verificationStatus, ready]);
 
   const displayName =
     user?.fullName ??
@@ -165,28 +169,38 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="flex items-center gap-1 max-md:hidden">
-            {navItems.map((item) => {
-              const isActive = mounted && pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-all duration-200 ${
-                    isActive
-                      ? "bg-[#D4AF37] text-[#1A1A1A]"
-                      : "text-[#FFFFF0] hover:bg-[#3E2723] hover:text-[#D4AF37]"
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.name}
-                </Link>
-              );
-            })}
+            {ready ? (
+              navItems.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#D4AF37] text-[#1A1A1A]"
+                        : "text-[#FFFFF0] hover:bg-[#3E2723] hover:text-[#D4AF37]"
+                    }`}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.name}
+                  </Link>
+                );
+              })
+            ) : (
+              <div className="flex items-center gap-2">
+                {[...Array(3)].map((_, idx) => (
+                  <div key={idx} className="px-4 py-2 rounded-lg bg-[#3E2723] text-transparent">
+                    Placeholder
+                  </div>
+                ))}
+              </div>
+            )}
           </nav>
 
           {/* User Menu */}
           <div className="flex items-center gap-3 max-md:hidden">
-            {isLoaded && isSignedIn ? (
+            {ready && isSignedIn ? (
               <div className="flex items-center gap-3">
                 {isVerifiedMiner && (
                   <div className="px-3 py-1 bg-[#D4AF37]/10 border border-[#D4AF37] rounded-full">
@@ -208,14 +222,20 @@ export default function Header() {
               </div>
             ) : (
               <div className="flex gap-2">
-                <SignInButton mode="modal">
-                  <Button
-                    variant="outline"
-                    className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#1A1A1A]"
-                  >
+                {ready ? (
+                  <SignInButton mode="modal">
+                    <Button
+                      variant="outline"
+                      className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#1A1A1A]"
+                    >
+                      Sign In
+                    </Button>
+                  </SignInButton>
+                ) : (
+                  <div className="px-4 py-2 bg-[#3E2723] rounded-lg border border-[#D4AF37]/20 text-transparent">
                     Sign In
-                  </Button>
-                </SignInButton>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -231,11 +251,11 @@ export default function Header() {
       </div>
 
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
+      {mobileMenuOpen && ready && (
         <div className="md:hidden bg-[#3E2723] border-t border-[#D4AF37]/20">
           <div className="px-4 py-4 space-y-2">
             {navItems.map((item) => {
-              const isActive = mounted && pathname === item.path;
+              const isActive = pathname === item.path;
               return (
                 <Link
                   key={item.path}
@@ -252,7 +272,7 @@ export default function Header() {
                 </Link>
               );
             })}
-            {isLoaded && isSignedIn ? (
+            {isSignedIn ? (
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);

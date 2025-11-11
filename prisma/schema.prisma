@@ -15,31 +15,31 @@ datasource db {
 }
 
 model User {
-  id                     String    @id @default(cuid())
-  email                  String    @unique
-  clerkId                String    @unique
-  firstName              String    @map("first_name")
-  lastName               String?    @map("last_name")
-  dateOfBirth            DateTime? @map("date_of_birth")
+  id                     String              @id @default(cuid())
+  email                  String              @unique
+  clerkId                String              @unique
+  firstName              String              @map("first_name")
+  lastName               String?             @map("last_name")
+  dateOfBirth            DateTime?           @map("date_of_birth")
   gender                 Gender?
   nationality            String?
   phone                  String?
   address                String?
   city                   String?
   state                  String?
-  zipCode                String?   @map("zip_code")
+  zipCode                String?             @map("zip_code")
   country                String?
   bio                    String?
-  role                   Role      @default(buyer)
-  status                 String?   @default("active") // Generic status field
+  role                   Role                @default(buyer)
+  status                 String?             @default("active") // Generic status field
   EmergencyContactName   String?
   EmergencyContactNumber String?
-  createdAt              DateTime  @default(now()) @map("created_at")
-  updatedAt              DateTime  @updatedAt @map("updated_at")
-
-  sellerApplications SellerApplication[]
-  articles           Article[]
-  productListings    ProductListing[]
+  createdAt              DateTime            @default(now()) @map("created_at")
+  updatedAt              DateTime            @updatedAt @map("updated_at")
+  isVerifiedMiner        Boolean             @default(false) @map("is_verified_miner")
+  sellerApplications     SellerApplication[]
+  articles               Article[]
+  productListings        ProductListing[]
 
   @@map("users")
 }
@@ -48,6 +48,7 @@ enum Role {
   admin
   seller
   buyer
+  miner
 }
 
 model SellerApplication {
@@ -82,22 +83,22 @@ enum Gender {
 }
 
 model Article {
-  id                 String         @id @default(cuid())
-  title              String
-  slug               String         @unique
-  category           ArticleCategory
-  excerpt            String?        @db.Text
-  content            String         @db.Text
-  coverImageUrl      String?        @map("cover_image_url")
-  imageGalleryUrls   String[]       @map("image_gallery_urls")
-  youtubeVideoUrl    String?        @map("youtube_video_url")
-  isPublished        Boolean        @default(false) @map("is_published")
-  featured           Boolean        @default(false)
-  views              Int            @default(0)
-  authorId           String         @map("author_id")
-  publishedAt        DateTime?      @map("published_at")
-  createdAt          DateTime       @default(now()) @map("created_at")
-  updatedAt          DateTime       @updatedAt @map("updated_at")
+  id               String          @id @default(cuid())
+  title            String
+  slug             String          @unique
+  category         ArticleCategory
+  excerpt          String?         @db.Text
+  content          String          @db.Text
+  coverImageUrl    String?         @map("cover_image_url")
+  imageGalleryUrls String[]        @map("image_gallery_urls")
+  youtubeVideoUrl  String?         @map("youtube_video_url")
+  isPublished      Boolean         @default(false) @map("is_published")
+  featured         Boolean         @default(false)
+  views            Int             @default(0)
+  authorId         String          @map("author_id")
+  publishedAt      DateTime?       @map("published_at")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
 
   author User @relation(fields: [authorId], references: [id])
 
@@ -119,25 +120,25 @@ enum ArticleCategory {
 }
 
 model ProductListing {
-  id               String              @id @default(cuid())
-  title            String
-  category         ProductCategory
-  description      String              @db.Text
-  imageUrls        String[]            @map("image_urls")
-  quantity         Float
-  unit             ProductUnit
-  purityGrade      String?             @map("purity_grade")
-  pricePerUnit     Float               @map("price_per_unit")
-  country          String
-  region           String?
-  shippingDetails  String?             @db.Text @map("shipping_details")
-  status           ListingStatus       @default(PENDING_REVIEW)
-  sellerId         String              @map("seller_id")
-  views            Int                 @default(0)
-  isActive         Boolean             @default(true) @map("is_active")
-  approvedAt       DateTime?           @map("approved_at")
-  createdAt        DateTime            @default(now()) @map("created_at")
-  updatedAt        DateTime            @updatedAt @map("updated_at")
+  id              String          @id @default(cuid())
+  title           String
+  category        ProductCategory
+  description     String          @db.Text
+  imageUrls       String[]        @map("image_urls")
+  quantity        Float
+  unit            ProductUnit
+  purityGrade     String?         @map("purity_grade")
+  pricePerUnit    Float           @map("price_per_unit")
+  country         String
+  region          String?
+  shippingDetails String?         @map("shipping_details") @db.Text
+  status          ListingStatus   @default(PENDING_REVIEW)
+  sellerId        String          @map("seller_id")
+  views           Int             @default(0)
+  isActive        Boolean         @default(true) @map("is_active")
+  approvedAt      DateTime?       @map("approved_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
 
   seller User @relation(fields: [sellerId], references: [id])
 
