@@ -63,6 +63,22 @@ type ApiResponse<T> = {
   data: T[];
 };
 
+type Transaction = {
+  id: string;
+  transaction_id: string;
+  product_title: string;
+  buyer_name: string;
+  seller_name: string;
+  quantity: number;
+  unit_price: number;
+  total_amount: number;
+  commission_amount: number;
+  seller_receives: number;
+  escrow_status: string;
+  buyer_confirmed: boolean;
+  created_date: string;
+};
+
 type DialogState =
   | { type: "approve_user"; entity: PendingVerification }
   | { type: "reject_user"; entity: PendingVerification }
@@ -139,32 +155,37 @@ function ProductsSkeleton() {
   );
 }
 
-const allTransactions = [
-  {
-    id: "txn-1",
-    transaction_id: "TXN-12345-ABCDE",
-    product_title: "Premium 24K Gold Nuggets",
-    buyer_name: "Buyer One",
-    seller_name: "John Miner",
-    total_amount: 3700,
-    commission_amount: 277.5,
-    seller_receives: 3422.5,
-    escrow_status: "completed",
-    created_date: new Date(2024, 0, 15).toISOString()
-  },
-  {
-    id: "txn-2",
-    transaction_id: "TXN-12346-FGHIJ",
-    product_title: "Raw Diamond Crystals",
-    buyer_name: "Buyer Two",
-    seller_name: "Jane Trader",
-    total_amount: 12500,
-    commission_amount: 937.5,
-    seller_receives: 11562.5,
-    escrow_status: "completed",
-    created_date: new Date(2024, 0, 10).toISOString()
-  }
-];
+function TransactionsSkeleton() {
+  return (
+    <div className="space-y-4">
+      {[...Array(3)].map((_, i) => (
+        <Card key={i} className="border">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row justify-between gap-4">
+              <div className="flex-1 space-y-3">
+                <Skeleton className="h-6 w-48" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-64" />
+                  <Skeleton className="h-4 w-56" />
+                  <Skeleton className="h-4 w-52" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </div>
+              <div className="text-right space-y-3">
+                <Skeleton className="h-6 w-24 ml-auto" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32 ml-auto" />
+                  <Skeleton className="h-4 w-28 ml-auto" />
+                  <Skeleton className="h-4 w-36 ml-auto" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
 
 export default function AdminDashboardPage() {
   const navigate = useRouter();
@@ -226,8 +247,26 @@ export default function AdminDashboardPage() {
     staleTime: 1000 * 60,
   });
 
+  const {
+    data: transactionsData,
+    isLoading: transactionsLoading,
+  } = useQuery<ApiResponse<Transaction>>({
+    queryKey: ["admin", "transactions"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/transactions");
+      if (!res.ok) throw new Error("Failed to fetch transactions");
+      return res.json() as Promise<ApiResponse<Transaction>>;
+    },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+  });
+
   const allUsersApi = verificationsData?.data ?? [];
   const allProductsApi = productsData?.data ?? [];
+  const allTransactions = transactionsData?.data ?? [];
 
   const filteredUsers = countryFilter === "all"
     ? allUsersApi
@@ -395,10 +434,10 @@ export default function AdminDashboardPage() {
     totalTransactions: allTransactions.length,
     completedTransactions: allTransactions.filter(t => t.escrow_status === 'completed').length,
     totalRevenue: allTransactions
-      .filter(t => t.escrow_status === 'completed')
+      .filter(t => ['completed', 'funds held', 'shipped'].includes(t.escrow_status))
       .reduce((sum, t) => sum + (t.total_amount || 0), 0),
     totalCommission: allTransactions
-      .filter(t => t.escrow_status === 'completed')
+      .filter(t => ['completed', 'funds held', 'shipped'].includes(t.escrow_status))
       .reduce((sum, t) => sum + (t.commission_amount || 0), 0)
   };
 
@@ -753,9 +792,11 @@ export default function AdminDashboardPage() {
                 <CardTitle>Recent Transactions</CardTitle>
               </CardHeader>
               <CardContent>
-                {allTransactions.length > 0 ? (
+                {transactionsLoading ? (
+                  <TransactionsSkeleton />
+                ) : allTransactions.length > 0 ? (
                   <div className="space-y-4">
-                    {allTransactions.slice(0, 10).map((transaction) => (
+                    {allTransactions.slice(0, 50).map((transaction) => (
                       <Card key={transaction.id} className="border">
                         <CardContent className="p-6">
                           <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -767,21 +808,23 @@ export default function AdminDashboardPage() {
                                 <p>Transaction ID: <span className="font-mono">{transaction.transaction_id}</span></p>
                                 <p>Buyer: <span className="font-semibold">{transaction.buyer_name}</span></p>
                                 <p>Seller: <span className="font-semibold">{transaction.seller_name}</span></p>
-                                <p>Date: {format(new Date(transaction.created_date), "MMM d, yyyy")}</p>
+                                <p>Quantity: <span className="font-semibold">{transaction.quantity} units</span></p>
+                                <p>Date: {format(new Date(transaction.created_date), "MMM d, yyyy 'at' h:mm a")}</p>
                               </div>
                             </div>
                             <div className="text-right">
                               <Badge className={
                                 transaction.escrow_status === 'completed' ? 'bg-green-100 text-green-800' :
                                 transaction.escrow_status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                                'bg-yellow-100 text-yellow-800'
+                                transaction.escrow_status === 'funds held' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-gray-100 text-gray-800'
                               }>
-                                {transaction.escrow_status.replace(/_/g, ' ')}
+                                {transaction.escrow_status}
                               </Badge>
                               <div className="mt-3 space-y-1 text-sm">
-                                <p className="text-gray-600">Total: <span className="font-bold text-[#1A1A1A]">${transaction.total_amount.toLocaleString()}</span></p>
-                                <p className="text-gray-600">Commission: <span className="font-bold text-[#D4AF37]">${transaction.commission_amount.toLocaleString()}</span></p>
-                                <p className="text-gray-600">Seller Gets: <span className="font-bold">${transaction.seller_receives.toLocaleString()}</span></p>
+                                <p className="text-gray-600">Total: <span className="font-bold text-[#1A1A1A]">${transaction.total_amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+                                <p className="text-gray-600">Commission: <span className="font-bold text-[#D4AF37]">${transaction.commission_amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+                                <p className="text-gray-600">Seller Gets: <span className="font-bold">${transaction.seller_receives.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
                               </div>
                             </div>
                           </div>

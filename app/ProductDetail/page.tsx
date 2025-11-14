@@ -21,6 +21,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import InquiryForm from "@/components/inquiries/InquiryForm";
 
 type ProductDetail = {
   id: string;
@@ -115,7 +116,11 @@ function ProductDetailContent({ productId }: { productId: string }) {
         region: listing.region,
         shipping_details: listing.shippingDetails || listing.shipping_details,
         image_urls: listing.imageUrls || listing.image_urls,
-        seller: listing.seller || { full_name: "Unknown Seller", country: listing.country },
+        seller: listing.seller ? {
+          id: listing.seller.id,
+          full_name: listing.seller.full_name || [listing.seller.firstName, listing.seller.lastName].filter(Boolean).join(" ") || "Unknown Seller",
+          country: listing.seller.country || listing.country,
+        } : { full_name: "Unknown Seller", country: listing.country },
         views: listing.views || 0,
         created_date: listing.createdAt || listing.created_date,
       };
@@ -135,12 +140,48 @@ function ProductDetailContent({ productId }: { productId: string }) {
   const totalPrice = quantity * product.price_per_unit;
 
   const handlePurchase = async () => {
+    if (!product) return;
+
+    // Validate quantity
+    if (quantity <= 0) {
+      alert("Please enter a valid quantity");
+      return;
+    }
+
+    if (quantity > product.quantity) {
+      alert(`Only ${product.quantity} ${product.unit} available`);
+      return;
+    }
+
     setIsProcessing(true);
-    setTimeout(() => {
-      alert("Purchase initiated! Redirecting to dashboard...");
+
+    try {
+      const response = await fetch("/api/purchases", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: product.id,
+          quantity: quantity,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to process purchase");
+      }
+
+      // Success
+      alert(data.message || "Purchase completed successfully! Redirecting to dashboard...");
       router.push("/BuyerDashboard");
+    } catch (error) {
+      console.error("Purchase error:", error);
+      alert(error instanceof Error ? error.message : "Failed to process purchase. Please try again.");
+    } finally {
       setIsProcessing(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -312,6 +353,10 @@ function ProductDetailContent({ productId }: { productId: string }) {
                 </Button>
               </CardContent>
             </Card>
+             
+         {/* Inquiry Form */}
+         {product && <InquiryForm product={product} />}
+
 
             {/* Seller Info */}
             {product.seller && (

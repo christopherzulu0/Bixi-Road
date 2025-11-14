@@ -52,7 +52,9 @@ export const ModelName = {
   User: 'User',
   SellerApplication: 'SellerApplication',
   Article: 'Article',
-  ProductListing: 'ProductListing'
+  ProductListing: 'ProductListing',
+  Transaction: 'Transaction',
+  Inquiry: 'Inquiry'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -162,6 +164,43 @@ export const ProductListingScalarFieldEnum = {
 } as const
 
 export type ProductListingScalarFieldEnum = (typeof ProductListingScalarFieldEnum)[keyof typeof ProductListingScalarFieldEnum]
+
+
+export const TransactionScalarFieldEnum = {
+  id: 'id',
+  transactionId: 'transactionId',
+  productId: 'productId',
+  buyerId: 'buyerId',
+  sellerId: 'sellerId',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  totalAmount: 'totalAmount',
+  commissionRate: 'commissionRate',
+  commissionAmount: 'commissionAmount',
+  sellerReceives: 'sellerReceives',
+  escrowStatus: 'escrowStatus',
+  buyerConfirmed: 'buyerConfirmed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const InquiryScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  buyerId: 'buyerId',
+  sellerId: 'sellerId',
+  message: 'message',
+  response: 'response',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  respondedAt: 'respondedAt'
+} as const
+
+export type InquiryScalarFieldEnum = (typeof InquiryScalarFieldEnum)[keyof typeof InquiryScalarFieldEnum]
 
 
 export const SortOrder = {

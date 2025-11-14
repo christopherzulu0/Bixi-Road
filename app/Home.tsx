@@ -45,6 +45,19 @@ type FeaturedProductsResponse = {
   data: FeaturedProduct[];
 };
 
+type VerifiedMiner = {
+  id: string;
+  full_name: string;
+  country: string;
+  rating_average: number;
+  total_reviews: number;
+  total_sales: number;
+};
+
+type VerifiedMinersResponse = {
+  data: VerifiedMiner[];
+};
+
 function FeaturedProductsSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -91,42 +104,78 @@ function FeaturedProductsContent() {
   );
 }
 
+function VerifiedMinersSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(4)].map((_, i) => (
+        <Card key={i} className="p-6">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <Skeleton className="w-20 h-20 rounded-full" />
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-16" />
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function VerifiedMinersContent() {
+  const { data, isLoading } = useQuery<VerifiedMinersResponse>({
+    queryKey: ["home", "verified-miners"],
+    queryFn: async () => {
+      const res = await fetch("/api/home/verified-miners", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch verified miners");
+      return res.json() as Promise<VerifiedMinersResponse>;
+    },
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  if (isLoading || !data) {
+    return <VerifiedMinersSkeleton />;
+  }
+
+  if (data.data.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {data.data.map((miner) => (
+        <Link key={miner.id} href={`/MinerProfile?id=${miner.id}`}>
+          <Card className="p-6 hover:shadow-xl transition-all duration-200 hover:border-[#D4AF37] border-2 group">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#D4AF37] to-[#F4E4BC] rounded-full flex items-center justify-center mb-4 text-2xl font-bold text-[#1A1A1A] group-hover:scale-110 transition-transform">
+                {miner.full_name?.[0] || 'M'}
+              </div>
+              <h3 className="font-bold text-lg text-[#1A1A1A] mb-1">{miner.full_name}</h3>
+              <div className="flex items-center gap-1 text-[#D4AF37] mb-2">
+                <Shield className="w-4 h-4" />
+                <span className="text-xs font-semibold">CERTIFIED</span>
+              </div>
+              <div className="flex items-center gap-1 mb-2">
+                <MapPin className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-600">{miner.country}</span>
+              </div>
+              {miner.rating_average > 0 && (
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
+                  <span className="font-semibold">{miner.rating_average.toFixed(1)}</span>
+                  <span className="text-sm text-gray-500">({miner.total_reviews})</span>
+                </div>
+              )}
+            </div>
+          </Card>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export default function HomePage() {
-  // Static verified miners data
-  const verifiedMiners = [
-    {
-      id: '1',
-      full_name: 'Kwame Mensah',
-      country: 'Ghana',
-      rating_average: 4.8,
-      total_reviews: 127,
-      total_sales: 450
-    },
-    {
-      id: '2',
-      full_name: 'Joseph Mwangi',
-      country: 'Kenya',
-      rating_average: 4.9,
-      total_reviews: 203,
-      total_sales: 680
-    },
-    {
-      id: '3',
-      full_name: 'Sarah Johnson',
-      country: 'South Africa',
-      rating_average: 4.7,
-      total_reviews: 89,
-      total_sales: 320
-    },
-    {
-      id: '4',
-      full_name: 'David Banda',
-      country: 'Zambia',
-      rating_average: 4.6,
-      total_reviews: 156,
-      total_sales: 540
-    }
-  ];
 
   const features = [
     {
@@ -380,50 +429,22 @@ export default function HomePage() {
       </section>
 
       {/* Verified Miners */}
-      {verifiedMiners.length > 0 && (
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] mb-4">
-                Top Verified Miners
-              </h2>
-              <p className="text-lg text-gray-600">
-                Trusted sellers with proven track records
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {verifiedMiners.map((miner) => (
-                <Link key={miner.id} href={`/miner-profile?id=${miner.id}`}>
-                  <Card className="p-6 hover:shadow-xl transition-all duration-200 hover:border-[#D4AF37] border-2 group">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 bg-gradient-to-br from-[#D4AF37] to-[#F4E4BC] rounded-full flex items-center justify-center mb-4 text-2xl font-bold text-[#1A1A1A] group-hover:scale-110 transition-transform">
-                        {miner.full_name?.[0] || 'M'}
-                      </div>
-                      <h3 className="font-bold text-lg text-[#1A1A1A] mb-1">{miner.full_name}</h3>
-                      <div className="flex items-center gap-1 text-[#D4AF37] mb-2">
-                        <Shield className="w-4 h-4" />
-                        <span className="text-xs font-semibold">CERTIFIED</span>
-                      </div>
-                      <div className="flex items-center gap-1 mb-2">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">{miner.country}</span>
-                      </div>
-                      {miner.rating_average > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
-                          <span className="font-semibold">{miner.rating_average.toFixed(1)}</span>
-                          <span className="text-sm text-gray-500">({miner.total_reviews})</span>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] mb-4">
+              Top Verified Miners
+            </h2>
+            <p className="text-lg text-gray-600">
+              Trusted sellers with proven track records
+            </p>
           </div>
-        </section>
-      )}
+          
+          <Suspense fallback={<VerifiedMinersSkeleton />}>
+            <VerifiedMinersContent />
+          </Suspense>
+        </div>
+      </section>
 
       {/* Countries Section */}
       <section className="py-20 bg-gradient-to-br from-[#1A1A1A] to-[#3E2723]">

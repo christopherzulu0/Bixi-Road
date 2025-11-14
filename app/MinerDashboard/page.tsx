@@ -20,7 +20,7 @@ import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type MinerDashboardStats = {
@@ -133,6 +133,7 @@ function MinerDashboardSkeleton() {
 
 function MinerDashboardContent() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [response, setResponse] = useState("");
 
@@ -147,6 +148,33 @@ function MinerDashboardContent() {
     },
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60,
+  });
+
+  const respondToInquiryMutation = useMutation({
+    mutationFn: async ({ inquiryId, responseText }: { inquiryId: string; responseText: string }) => {
+      const res = await fetch(`/api/inquiries/${inquiryId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ response: responseText }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to respond to inquiry");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["miner", "dashboard"] });
+      setRespondingTo(null);
+      setResponse("");
+      alert("Response sent successfully!");
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : "Failed to respond to inquiry";
+      alert(message);
+    },
   });
 
   if (!data?.data) {
@@ -225,10 +253,12 @@ function MinerDashboardContent() {
     console.info("Request to delete product", productId);
   };
 
-  const handleRespond = (inquiryId: string) => {
-    console.info("Responded to inquiry", inquiryId, response);
-    setRespondingTo(null);
-    setResponse("");
+  const handleRespond = async (inquiryId: string) => {
+    if (!response.trim()) {
+      alert("Please enter a response");
+      return;
+    }
+    respondToInquiryMutation.mutate({ inquiryId, responseText: response });
   };
 
   return (
@@ -499,10 +529,10 @@ function MinerDashboardContent() {
                           <div className="flex gap-2">
                             <Button
                               onClick={() => handleRespond(inquiry.id)}
-                              disabled={!response.trim()}
+                              disabled={!response.trim() || respondToInquiryMutation.isPending}
                               className="bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A]"
                             >
-                              Send Response
+                              {respondToInquiryMutation.isPending ? "Sending..." : "Send Response"}
                             </Button>
                             <Button
                               variant="outline"
@@ -510,6 +540,7 @@ function MinerDashboardContent() {
                                 setRespondingTo(null);
                                 setResponse("");
                               }}
+                              disabled={respondToInquiryMutation.isPending}
                             >
                               Cancel
                             </Button>

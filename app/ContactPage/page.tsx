@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { 
   Mail, 
   Phone, 
@@ -29,21 +30,46 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
     
     if (!formData.name || !formData.email || !formData.message) {
-      alert("Please fill in all required fields");
+      setError("Please fill in all required fields");
       return;
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
+
       setSubmitted(true);
       setFormData({ name: "", email: "", subject: "general", message: "" });
+    } catch (error) {
+      console.error("Contact form error:", error);
+      setError(error instanceof Error ? error.message : "Error sending message. Please try again.");
+    } finally {
       setIsSubmitting(false);
-    }, 1200);
+    }
   };
 
   const contactInfo = [
@@ -136,15 +162,33 @@ export default function ContactPage() {
               </CardHeader>
               <CardContent>
                 {submitted ? (
-                  <Alert className="bg-green-50 border-green-200">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <AlertDescription className="text-green-800">
-                      <strong>Message sent successfully!</strong><br />
-                      We've received your message and will respond within 24 hours.
-                    </AlertDescription>
-                  </Alert>
+                  <div className="space-y-4">
+                    <Alert className="bg-green-50 border-green-200">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <AlertDescription className="text-green-800">
+                        <strong>Message sent successfully!</strong><br />
+                        We've received your message and will respond within 24 hours. A confirmation email has been sent to your inbox.
+                      </AlertDescription>
+                    </Alert>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setSubmitted(false)}
+                      className="w-full"
+                    >
+                      Send Another Message
+                    </Button>
+                  </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                      <Alert className="bg-red-50 border-red-200">
+                        <AlertCircle className="w-4 h-4 text-red-600" />
+                        <AlertDescription className="text-red-800">
+                          {error}
+                        </AlertDescription>
+                      </Alert>
+                    )}
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name *</Label>
                       <Input

@@ -37,3 +37,13 @@ export type Article = Prisma.ArticleModel
  * 
  */
 export type ProductListing = Prisma.ProductListingModel
+/**
+ * Model Transaction
+ * 
+ */
+export type Transaction = Prisma.TransactionModel
+/**
+ * Model Inquiry
+ * 
+ */
+export type Inquiry = Prisma.InquiryModel

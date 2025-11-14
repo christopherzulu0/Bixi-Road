@@ -25,22 +25,22 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-[#FFFFF0] mb-4">Platform</h4>
             <div className="space-y-2">
-              <Link href="/marketplace" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/MarketPlace" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Browse Marketplace
               </Link>
-              <Link href="/become-seller" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/BecomeSeller" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Become a Seller
               </Link>
-              <Link href="/news" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/News" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Market News
               </Link>
-              <Link href="/how-it-works" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/HowItWorks" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 How It Works
               </Link>
-              <Link href="/shipping-info" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/ShippingInfo" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Shipping Info
               </Link>
-              <Link href="/faq" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/FAQ" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 FAQ
               </Link>
             </div>
@@ -49,22 +49,22 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-[#FFFFF0] mb-4">Company</h4>
             <div className="space-y-2">
-              <Link href="/about-us" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/AboutUs" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 About Us
               </Link>
-              <Link href="/contact" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/ContactPage" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Contact Us
               </Link>
-              <Link href="/terms-of-service" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="#" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/privacy-policy" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/#" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/cookies-policy" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="#" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Cookies Policy
               </Link>
-              <Link href="/community-guidelines" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
+              <Link href="/CommunityGuidelines" className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
                 Community Guidelines
               </Link>
             </div>

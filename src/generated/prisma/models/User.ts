@@ -321,6 +321,9 @@ export type UserWhereInput = {
   sellerApplications?: Prisma.SellerApplicationListRelationFilter
   articles?: Prisma.ArticleListRelationFilter
   productListings?: Prisma.ProductListingListRelationFilter
+  purchases?: Prisma.TransactionListRelationFilter
+  inquiriesSent?: Prisma.InquiryListRelationFilter
+  inquiriesReceived?: Prisma.InquiryListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -349,6 +352,9 @@ export type UserOrderByWithRelationInput = {
   sellerApplications?: Prisma.SellerApplicationOrderByRelationAggregateInput
   articles?: Prisma.ArticleOrderByRelationAggregateInput
   productListings?: Prisma.ProductListingOrderByRelationAggregateInput
+  purchases?: Prisma.TransactionOrderByRelationAggregateInput
+  inquiriesSent?: Prisma.InquiryOrderByRelationAggregateInput
+  inquiriesReceived?: Prisma.InquiryOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -380,6 +386,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sellerApplications?: Prisma.SellerApplicationListRelationFilter
   articles?: Prisma.ArticleListRelationFilter
   productListings?: Prisma.ProductListingListRelationFilter
+  purchases?: Prisma.TransactionListRelationFilter
+  inquiriesSent?: Prisma.InquiryListRelationFilter
+  inquiriesReceived?: Prisma.InquiryListRelationFilter
 }, "id" | "email" | "clerkId">
 
 export type UserOrderByWithAggregationInput = {
@@ -464,6 +473,9 @@ export type UserCreateInput = {
   sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryCreateNestedManyWithoutSellerInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -492,6 +504,9 @@ export type UserUncheckedCreateInput = {
   sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerInput
 }
 
 export type UserUpdateInput = {
@@ -520,6 +535,9 @@ export type UserUpdateInput = {
   sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUpdateManyWithoutSellerNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -548,6 +566,9 @@ export type UserUncheckedUpdateInput = {
   sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUncheckedUpdateManyWithoutSellerNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -775,6 +796,48 @@ export type UserUpdateOneRequiredWithoutProductListingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProductListingsInput, Prisma.UserUpdateWithoutProductListingsInput>, Prisma.UserUncheckedUpdateWithoutProductListingsInput>
 }
 
+export type UserCreateNestedOneWithoutPurchasesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPurchasesInput, Prisma.UserUncheckedCreateWithoutPurchasesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPurchasesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPurchasesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPurchasesInput, Prisma.UserUncheckedCreateWithoutPurchasesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPurchasesInput
+  upsert?: Prisma.UserUpsertWithoutPurchasesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPurchasesInput, Prisma.UserUpdateWithoutPurchasesInput>, Prisma.UserUncheckedUpdateWithoutPurchasesInput>
+}
+
+export type UserCreateNestedOneWithoutInquiriesSentInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInquiriesSentInput, Prisma.UserUncheckedCreateWithoutInquiriesSentInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInquiriesSentInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutInquiriesReceivedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInquiriesReceivedInput, Prisma.UserUncheckedCreateWithoutInquiriesReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInquiriesReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutInquiriesSentNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInquiriesSentInput, Prisma.UserUncheckedCreateWithoutInquiriesSentInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInquiriesSentInput
+  upsert?: Prisma.UserUpsertWithoutInquiriesSentInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInquiriesSentInput, Prisma.UserUpdateWithoutInquiriesSentInput>, Prisma.UserUncheckedUpdateWithoutInquiriesSentInput>
+}
+
+export type UserUpdateOneRequiredWithoutInquiriesReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInquiriesReceivedInput, Prisma.UserUncheckedCreateWithoutInquiriesReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInquiriesReceivedInput
+  upsert?: Prisma.UserUpsertWithoutInquiriesReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInquiriesReceivedInput, Prisma.UserUpdateWithoutInquiriesReceivedInput>, Prisma.UserUncheckedUpdateWithoutInquiriesReceivedInput>
+}
+
 export type UserCreateWithoutSellerApplicationsInput = {
   id?: string
   email: string
@@ -800,6 +863,9 @@ export type UserCreateWithoutSellerApplicationsInput = {
   isVerifiedMiner?: boolean
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryCreateNestedManyWithoutSellerInput
 }
 
 export type UserUncheckedCreateWithoutSellerApplicationsInput = {
@@ -827,6 +893,9 @@ export type UserUncheckedCreateWithoutSellerApplicationsInput = {
   isVerifiedMiner?: boolean
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerInput
 }
 
 export type UserCreateOrConnectWithoutSellerApplicationsInput = {
@@ -870,6 +939,9 @@ export type UserUpdateWithoutSellerApplicationsInput = {
   isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUpdateManyWithoutSellerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSellerApplicationsInput = {
@@ -897,6 +969,9 @@ export type UserUncheckedUpdateWithoutSellerApplicationsInput = {
   isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUncheckedUpdateManyWithoutSellerNestedInput
 }
 
 export type UserCreateWithoutArticlesInput = {
@@ -924,6 +999,9 @@ export type UserCreateWithoutArticlesInput = {
   isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
   productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryCreateNestedManyWithoutSellerInput
 }
 
 export type UserUncheckedCreateWithoutArticlesInput = {
@@ -951,6 +1029,9 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
   productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerInput
 }
 
 export type UserCreateOrConnectWithoutArticlesInput = {
@@ -994,6 +1075,9 @@ export type UserUpdateWithoutArticlesInput = {
   isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
   productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUpdateManyWithoutSellerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutArticlesInput = {
@@ -1021,6 +1105,9 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
   productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUncheckedUpdateManyWithoutSellerNestedInput
 }
 
 export type UserCreateWithoutProductListingsInput = {
@@ -1048,6 +1135,9 @@ export type UserCreateWithoutProductListingsInput = {
   isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  purchases?: Prisma.TransactionCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryCreateNestedManyWithoutSellerInput
 }
 
 export type UserUncheckedCreateWithoutProductListingsInput = {
@@ -1075,6 +1165,9 @@ export type UserUncheckedCreateWithoutProductListingsInput = {
   isVerifiedMiner?: boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  purchases?: Prisma.TransactionUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerInput
 }
 
 export type UserCreateOrConnectWithoutProductListingsInput = {
@@ -1118,6 +1211,9 @@ export type UserUpdateWithoutProductListingsInput = {
   isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  purchases?: Prisma.TransactionUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUpdateManyWithoutSellerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductListingsInput = {
@@ -1145,6 +1241,417 @@ export type UserUncheckedUpdateWithoutProductListingsInput = {
   isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  purchases?: Prisma.TransactionUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUncheckedUpdateManyWithoutSellerNestedInput
+}
+
+export type UserCreateWithoutPurchasesInput = {
+  id?: string
+  email: string
+  clerkId: string
+  firstName: string
+  lastName?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: $Enums.Gender | null
+  nationality?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  zipCode?: string | null
+  country?: string | null
+  bio?: string | null
+  role?: $Enums.Role
+  status?: string | null
+  EmergencyContactName?: string | null
+  EmergencyContactNumber?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isVerifiedMiner?: boolean
+  sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
+  articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
+  inquiriesSent?: Prisma.InquiryCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryCreateNestedManyWithoutSellerInput
+}
+
+export type UserUncheckedCreateWithoutPurchasesInput = {
+  id?: string
+  email: string
+  clerkId: string
+  firstName: string
+  lastName?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: $Enums.Gender | null
+  nationality?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  zipCode?: string | null
+  country?: string | null
+  bio?: string | null
+  role?: $Enums.Role
+  status?: string | null
+  EmergencyContactName?: string | null
+  EmergencyContactNumber?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isVerifiedMiner?: boolean
+  sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
+  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
+  inquiriesSent?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerInput
+}
+
+export type UserCreateOrConnectWithoutPurchasesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPurchasesInput, Prisma.UserUncheckedCreateWithoutPurchasesInput>
+}
+
+export type UserUpsertWithoutPurchasesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPurchasesInput, Prisma.UserUncheckedUpdateWithoutPurchasesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPurchasesInput, Prisma.UserUncheckedCreateWithoutPurchasesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPurchasesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPurchasesInput, Prisma.UserUncheckedUpdateWithoutPurchasesInput>
+}
+
+export type UserUpdateWithoutPurchasesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkId?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zipCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
+  articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
+  inquiriesSent?: Prisma.InquiryUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUpdateManyWithoutSellerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPurchasesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkId?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zipCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
+  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
+  inquiriesSent?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUncheckedUpdateManyWithoutSellerNestedInput
+}
+
+export type UserCreateWithoutInquiriesSentInput = {
+  id?: string
+  email: string
+  clerkId: string
+  firstName: string
+  lastName?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: $Enums.Gender | null
+  nationality?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  zipCode?: string | null
+  country?: string | null
+  bio?: string | null
+  role?: $Enums.Role
+  status?: string | null
+  EmergencyContactName?: string | null
+  EmergencyContactNumber?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isVerifiedMiner?: boolean
+  sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
+  articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryCreateNestedManyWithoutSellerInput
+}
+
+export type UserUncheckedCreateWithoutInquiriesSentInput = {
+  id?: string
+  email: string
+  clerkId: string
+  firstName: string
+  lastName?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: $Enums.Gender | null
+  nationality?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  zipCode?: string | null
+  country?: string | null
+  bio?: string | null
+  role?: $Enums.Role
+  status?: string | null
+  EmergencyContactName?: string | null
+  EmergencyContactNumber?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isVerifiedMiner?: boolean
+  sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
+  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesReceived?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerInput
+}
+
+export type UserCreateOrConnectWithoutInquiriesSentInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutInquiriesSentInput, Prisma.UserUncheckedCreateWithoutInquiriesSentInput>
+}
+
+export type UserCreateWithoutInquiriesReceivedInput = {
+  id?: string
+  email: string
+  clerkId: string
+  firstName: string
+  lastName?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: $Enums.Gender | null
+  nationality?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  zipCode?: string | null
+  country?: string | null
+  bio?: string | null
+  role?: $Enums.Role
+  status?: string | null
+  EmergencyContactName?: string | null
+  EmergencyContactNumber?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isVerifiedMiner?: boolean
+  sellerApplications?: Prisma.SellerApplicationCreateNestedManyWithoutUserInput
+  articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  productListings?: Prisma.ProductListingCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryCreateNestedManyWithoutBuyerInput
+}
+
+export type UserUncheckedCreateWithoutInquiriesReceivedInput = {
+  id?: string
+  email: string
+  clerkId: string
+  firstName: string
+  lastName?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: $Enums.Gender | null
+  nationality?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  zipCode?: string | null
+  country?: string | null
+  bio?: string | null
+  role?: $Enums.Role
+  status?: string | null
+  EmergencyContactName?: string | null
+  EmergencyContactNumber?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isVerifiedMiner?: boolean
+  sellerApplications?: Prisma.SellerApplicationUncheckedCreateNestedManyWithoutUserInput
+  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  productListings?: Prisma.ProductListingUncheckedCreateNestedManyWithoutSellerInput
+  purchases?: Prisma.TransactionUncheckedCreateNestedManyWithoutBuyerInput
+  inquiriesSent?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerInput
+}
+
+export type UserCreateOrConnectWithoutInquiriesReceivedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutInquiriesReceivedInput, Prisma.UserUncheckedCreateWithoutInquiriesReceivedInput>
+}
+
+export type UserUpsertWithoutInquiriesSentInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutInquiriesSentInput, Prisma.UserUncheckedUpdateWithoutInquiriesSentInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutInquiriesSentInput, Prisma.UserUncheckedCreateWithoutInquiriesSentInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutInquiriesSentInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutInquiriesSentInput, Prisma.UserUncheckedUpdateWithoutInquiriesSentInput>
+}
+
+export type UserUpdateWithoutInquiriesSentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkId?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zipCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
+  articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUpdateManyWithoutSellerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutInquiriesSentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkId?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zipCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
+  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesReceived?: Prisma.InquiryUncheckedUpdateManyWithoutSellerNestedInput
+}
+
+export type UserUpsertWithoutInquiriesReceivedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutInquiriesReceivedInput, Prisma.UserUncheckedUpdateWithoutInquiriesReceivedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutInquiriesReceivedInput, Prisma.UserUncheckedCreateWithoutInquiriesReceivedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutInquiriesReceivedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutInquiriesReceivedInput, Prisma.UserUncheckedUpdateWithoutInquiriesReceivedInput>
+}
+
+export type UserUpdateWithoutInquiriesReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkId?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zipCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sellerApplications?: Prisma.SellerApplicationUpdateManyWithoutUserNestedInput
+  articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  productListings?: Prisma.ProductListingUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUpdateManyWithoutBuyerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutInquiriesReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkId?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zipCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  EmergencyContactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerifiedMiner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sellerApplications?: Prisma.SellerApplicationUncheckedUpdateManyWithoutUserNestedInput
+  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  productListings?: Prisma.ProductListingUncheckedUpdateManyWithoutSellerNestedInput
+  purchases?: Prisma.TransactionUncheckedUpdateManyWithoutBuyerNestedInput
+  inquiriesSent?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerNestedInput
 }
 
 
@@ -1156,12 +1663,18 @@ export type UserCountOutputType = {
   sellerApplications: number
   articles: number
   productListings: number
+  purchases: number
+  inquiriesSent: number
+  inquiriesReceived: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sellerApplications?: boolean | UserCountOutputTypeCountSellerApplicationsArgs
   articles?: boolean | UserCountOutputTypeCountArticlesArgs
   productListings?: boolean | UserCountOutputTypeCountProductListingsArgs
+  purchases?: boolean | UserCountOutputTypeCountPurchasesArgs
+  inquiriesSent?: boolean | UserCountOutputTypeCountInquiriesSentArgs
+  inquiriesReceived?: boolean | UserCountOutputTypeCountInquiriesReceivedArgs
 }
 
 /**
@@ -1195,6 +1708,27 @@ export type UserCountOutputTypeCountProductListingsArgs<ExtArgs extends runtime.
   where?: Prisma.ProductListingWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPurchasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TransactionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountInquiriesSentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InquiryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountInquiriesReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InquiryWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1222,6 +1756,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sellerApplications?: boolean | Prisma.User$sellerApplicationsArgs<ExtArgs>
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   productListings?: boolean | Prisma.User$productListingsArgs<ExtArgs>
+  purchases?: boolean | Prisma.User$purchasesArgs<ExtArgs>
+  inquiriesSent?: boolean | Prisma.User$inquiriesSentArgs<ExtArgs>
+  inquiriesReceived?: boolean | Prisma.User$inquiriesReceivedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1305,6 +1842,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sellerApplications?: boolean | Prisma.User$sellerApplicationsArgs<ExtArgs>
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   productListings?: boolean | Prisma.User$productListingsArgs<ExtArgs>
+  purchases?: boolean | Prisma.User$purchasesArgs<ExtArgs>
+  inquiriesSent?: boolean | Prisma.User$inquiriesSentArgs<ExtArgs>
+  inquiriesReceived?: boolean | Prisma.User$inquiriesReceivedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1316,6 +1856,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sellerApplications: Prisma.$SellerApplicationPayload<ExtArgs>[]
     articles: Prisma.$ArticlePayload<ExtArgs>[]
     productListings: Prisma.$ProductListingPayload<ExtArgs>[]
+    purchases: Prisma.$TransactionPayload<ExtArgs>[]
+    inquiriesSent: Prisma.$InquiryPayload<ExtArgs>[]
+    inquiriesReceived: Prisma.$InquiryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1737,6 +2280,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sellerApplications<T extends Prisma.User$sellerApplicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sellerApplicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   articles<T extends Prisma.User$articlesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$articlesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   productListings<T extends Prisma.User$productListingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$productListingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchases<T extends Prisma.User$purchasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$purchasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  inquiriesSent<T extends Prisma.User$inquiriesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$inquiriesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InquiryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  inquiriesReceived<T extends Prisma.User$inquiriesReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$inquiriesReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InquiryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2245,6 +2791,78 @@ export type User$productListingsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.ProductListingScalarFieldEnum | Prisma.ProductListingScalarFieldEnum[]
+}
+
+/**
+ * User.purchases
+ */
+export type User$purchasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Transaction
+   */
+  select?: Prisma.TransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Transaction
+   */
+  omit?: Prisma.TransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransactionInclude<ExtArgs> | null
+  where?: Prisma.TransactionWhereInput
+  orderBy?: Prisma.TransactionOrderByWithRelationInput | Prisma.TransactionOrderByWithRelationInput[]
+  cursor?: Prisma.TransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TransactionScalarFieldEnum | Prisma.TransactionScalarFieldEnum[]
+}
+
+/**
+ * User.inquiriesSent
+ */
+export type User$inquiriesSentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Inquiry
+   */
+  select?: Prisma.InquirySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Inquiry
+   */
+  omit?: Prisma.InquiryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InquiryInclude<ExtArgs> | null
+  where?: Prisma.InquiryWhereInput
+  orderBy?: Prisma.InquiryOrderByWithRelationInput | Prisma.InquiryOrderByWithRelationInput[]
+  cursor?: Prisma.InquiryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InquiryScalarFieldEnum | Prisma.InquiryScalarFieldEnum[]
+}
+
+/**
+ * User.inquiriesReceived
+ */
+export type User$inquiriesReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Inquiry
+   */
+  select?: Prisma.InquirySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Inquiry
+   */
+  omit?: Prisma.InquiryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InquiryInclude<ExtArgs> | null
+  where?: Prisma.InquiryWhereInput
+  orderBy?: Prisma.InquiryOrderByWithRelationInput | Prisma.InquiryOrderByWithRelationInput[]
+  cursor?: Prisma.InquiryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InquiryScalarFieldEnum | Prisma.InquiryScalarFieldEnum[]
 }
 
 /**

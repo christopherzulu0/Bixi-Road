@@ -53,9 +53,39 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get user's transactions (future implementation - for now return empty)
-    // This would need a Transaction/Order model in your schema
-    const transactions: Transaction[] = [];
+    // Get user's transactions
+    const dbTransactions = await prisma.transaction.findMany({
+      where: { buyerId: user.id },
+      include: {
+        product: {
+          select: {
+            title: true,
+            seller: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const transactions: Transaction[] = dbTransactions.map((t) => ({
+      id: t.id,
+      transaction_id: t.transactionId,
+      product_title: t.product.title,
+      seller_name: [t.product.seller.firstName, t.product.seller.lastName]
+        .filter(Boolean)
+        .join(" "),
+      quantity: t.quantity,
+      unit_price: t.unitPrice,
+      total_amount: t.totalAmount,
+      escrow_status: t.escrowStatus.toLowerCase().replace(/_/g, " "),
+      buyer_confirmed: t.buyerConfirmed,
+      created_date: t.createdAt.toISOString(),
+    }));
 
     // Calculate stats
     const stats: BuyerStats = {

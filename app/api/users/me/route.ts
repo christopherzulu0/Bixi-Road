@@ -21,6 +21,7 @@ export async function GET() {
       prisma.user.findUnique({
         where: { clerkId: userId },
         select: {
+          id: true,
           role: true,
           status: true,
         },
@@ -53,6 +54,7 @@ export async function GET() {
 
     return NextResponse.json(
       {
+        id: dbUser.id,
         role: normalizedRole,
         isVerifiedMiner,
         verificationStatus: dbUser.status ?? null,

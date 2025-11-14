@@ -87,6 +87,42 @@ export async function GET() {
       updatedAt: listing.updatedAt,
     }));
 
+    // Fetch inquiries for this seller
+    const inquiries = await prisma.inquiry.findMany({
+      where: { sellerId: dbUser.id },
+      include: {
+        product: {
+          select: {
+            title: true,
+          },
+        },
+        buyer: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const formattedInquiries = inquiries.map((inquiry) => ({
+      id: inquiry.id,
+      productTitle: inquiry.product.title,
+      buyerName: [inquiry.buyer.firstName, inquiry.buyer.lastName]
+        .filter(Boolean)
+        .join(" ") || "Unknown Buyer",
+      message: inquiry.message,
+      status: inquiry.status.toLowerCase(),
+      response: inquiry.response,
+      createdAt: inquiry.createdAt.toISOString(),
+    }));
+
+    const totalInquiries = inquiries.length;
+    const pendingInquiries = inquiries.filter(
+      (i) => i.status === $Enums.InquiryStatus.PENDING
+    ).length;
+
     return NextResponse.json({
       data: {
         user: userProfile,
@@ -94,13 +130,14 @@ export async function GET() {
           totalListings,
           activeListings,
           totalViews,
-          totalInquiries: 0,
+          totalInquiries,
+          pendingInquiries,
           totalSales,
           totalRevenue,
           pendingTransactions,
         },
         products,
-        inquiries: [],
+        inquiries: formattedInquiries,
         transactions: [],
       },
     });

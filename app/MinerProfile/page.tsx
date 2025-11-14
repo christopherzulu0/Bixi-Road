@@ -1,9 +1,10 @@
 'use client'
 
-import React from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Shield, 
   MapPin, 
@@ -13,66 +14,125 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import ProductCard from "../../components/marketplace/ProductCard";
 
-// Static data
-const miner = {
-  id: "miner-1",
-  full_name: "John Miner",
-  country: "Ghana",
-  mine_location: "Ashanti Region",
-  bio: "Experienced gold miner with over 15 years in the industry. Specializing in high-quality gold nuggets from the Ashanti Region.",
-  rating_average: 4.5,
-  total_reviews: 23,
-  total_sales: 15
+type MinerProfileProduct = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price_per_unit: number;
+  unit: string;
+  quantity: number;
+  purity_grade: string | null;
+  country: string;
+  image_urls: string[];
+  seller: {
+    full_name: string;
+    country: string;
+  };
+  is_featured: boolean;
+  status: string;
+  views: number;
 };
 
-const products = [
-  {
-    id: "prod-1",
-    title: "Premium 24K Gold Nuggets",
-    category: "Gold",
-    price_per_unit: 1850,
-    unit: "grams",
-    quantity: 100,
-    image_urls: ["https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&h=300&fit=crop"]
-  },
-  {
-    id: "prod-2",
-    title: "Raw Gold Ore",
-    category: "Gold",
-    price_per_unit: 1200,
-    unit: "kilograms",
-    quantity: 50,
-    image_urls: ["https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&h=300&fit=crop"]
-  }
-];
+type MinerProfileReview = {
+  id: string;
+  buyer_name: string;
+  rating: number;
+  comment: string;
+  product_quality: number | null;
+  communication: number | null;
+  shipping_speed: number | null;
+  created_date: string;
+};
 
-const reviews = [
-  {
-    id: "rev-1",
-    buyer_name: "Buyer One",
-    rating: 5,
-    comment: "Excellent quality gold nuggets, exactly as described!",
-    product_quality: 5,
-    communication: 5,
-    shipping_speed: 4,
-    created_date: new Date(2024, 0, 10).toISOString()
-  },
-  {
-    id: "rev-2",
-    buyer_name: "Buyer Two",
-    rating: 4,
-    comment: "Good seller, reliable and professional.",
-    product_quality: 4,
-    communication: 4,
-    shipping_speed: 5,
-    created_date: new Date(2024, 0, 5).toISOString()
-  }
-];
+type MinerProfile = {
+  id: string;
+  full_name: string;
+  country: string;
+  mine_location: string | null;
+  bio: string | null;
+  rating_average: number;
+  total_reviews: number;
+  total_sales: number;
+  products: MinerProfileProduct[];
+  reviews: MinerProfileReview[];
+};
 
-export default function MinerProfilePage() {
+type MinerProfileResponse = {
+  data: MinerProfile;
+};
+
+function MinerProfileSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Skeleton className="h-10 w-24 mb-6" />
+        
+        <Card className="mb-12 border-2 border-gray-200">
+          <CardContent className="p-8">
+            <div className="flex flex-col md:flex-row gap-8">
+              <Skeleton className="w-32 h-32 rounded-full flex-shrink-0" />
+              <div className="flex-1 space-y-4">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-5 w-64" />
+                <Skeleton className="h-5 w-40" />
+                <div className="grid grid-cols-3 gap-6 mt-6">
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-20 w-full" />
+                  ))}
+                </div>
+                <Skeleton className="h-20 w-full mt-4" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-96 w-full" />
+          ))}
+        </div>
+
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="space-y-4">
+          {[...Array(2)].map((_, i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MinerProfileContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const minerId = searchParams.get("id");
+
+  const { data, isLoading } = useQuery<MinerProfileResponse>({
+    queryKey: ["miner-profile", minerId],
+    queryFn: async () => {
+      const res = await fetch(`/api/miners/${minerId}`, { cache: "no-store" });
+      if (!res.ok) {
+        throw new Error("Failed to fetch miner profile");
+      }
+      return res.json() as Promise<MinerProfileResponse>;
+    },
+    enabled: Boolean(minerId),
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  if (isLoading || !data) {
+    return <MinerProfileSkeleton />;
+  }
+
+  const miner = data.data;
+  const { products, reviews } = miner;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
@@ -283,5 +343,13 @@ export default function MinerProfilePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function MinerProfilePage() {
+  return (
+    <Suspense fallback={<MinerProfileSkeleton />}>
+      <MinerProfileContent />
+    </Suspense>
   );
 }

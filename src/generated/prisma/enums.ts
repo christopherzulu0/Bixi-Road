@@ -91,3 +91,23 @@ export const ListingStatus = {
 } as const
 
 export type ListingStatus = (typeof ListingStatus)[keyof typeof ListingStatus]
+
+
+export const EscrowStatus = {
+  FUNDS_HELD: 'FUNDS_HELD',
+  SHIPPED: 'SHIPPED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type EscrowStatus = (typeof EscrowStatus)[keyof typeof EscrowStatus]
+
+
+export const InquiryStatus = {
+  PENDING: 'PENDING',
+  RESPONDED: 'RESPONDED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type InquiryStatus = (typeof InquiryStatus)[keyof typeof InquiryStatus]
