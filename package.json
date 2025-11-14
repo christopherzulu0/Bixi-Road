@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && prisma migrate deploy",
     "start": "next start",
     "lint": "eslint",
     "seed": "npx tsx prisma/seed.ts",
@@ -13,7 +13,8 @@
     "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "prisma": {
-    "seed": "npx tsx prisma/seed.ts"
+    "seed": "npx tsx prisma/seed.ts",
+    "schema": "./prisma/schema.prisma"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.34.5",

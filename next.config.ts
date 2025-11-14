@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
     '/api/**/*': ['./src/generated/prisma/**/*'],
     '/*': ['./src/generated/prisma/**/*'],
   },
+  
 };
 
 export default nextConfig;
