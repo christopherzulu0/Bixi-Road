@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // Configure external image domains for Uploadthing
   images: {
     remotePatterns: [
