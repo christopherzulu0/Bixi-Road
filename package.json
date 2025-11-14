@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "npx tsx prisma/seed.ts",
-    "seed:articles": "npx tsx prisma/seed-articles.ts"
+    "seed:articles": "npx tsx prisma/seed-articles.ts",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
