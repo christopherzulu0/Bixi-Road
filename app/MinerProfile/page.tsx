@@ -284,7 +284,7 @@ function MinerProfileContent() {
                                 <Star
                                   key={i}
                                   className={`w-3 h-3 ${
-                                    i < review.product_quality
+                                    i < (review.product_quality ?? 0)
                                       ? 'fill-[#D4AF37] text-[#D4AF37]'
                                       : 'text-gray-300'
                                   }`}
@@ -301,7 +301,7 @@ function MinerProfileContent() {
                                 <Star
                                   key={i}
                                   className={`w-3 h-3 ${
-                                    i < review.communication
+                                    i < (review.communication ?? 0)
                                       ? 'fill-[#D4AF37] text-[#D4AF37]'
                                       : 'text-gray-300'
                                   }`}
@@ -318,7 +318,7 @@ function MinerProfileContent() {
                                 <Star
                                   key={i}
                                   className={`w-3 h-3 ${
-                                    i < review.shipping_speed
+                                    i < (review.shipping_speed ?? 0)
                                       ? 'fill-[#D4AF37] text-[#D4AF37]'
                                       : 'text-gray-300'
                                   }`}

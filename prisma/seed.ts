@@ -1,4 +1,4 @@
-import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaClient, ProductCategory, ProductUnit, ListingStatus } from "../src/generated/prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -212,6 +212,9 @@ async function main() {
       const created = await prisma.productListing.create({
         data: {
           ...listing,
+          category: listing.category as ProductCategory,
+          unit: listing.unit as ProductUnit,
+          status: listing.status as ListingStatus,
           sellerId: USER_ID,
           approvedAt: listing.status === "LIVE" || listing.status === "APPROVED" 
             ? new Date() 

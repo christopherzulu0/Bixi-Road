@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  
   // Configure external image domains for Uploadthing
   images: {
     remotePatterns: [
