@@ -31,6 +31,9 @@ const nextConfig = {
         '/api/**/*': ['./src/generated/prisma/**/*'],
         '/*': ['./src/generated/prisma/**/*'],
     },
+    // Turbopack configuration (silences warning)
+    turbopack: {},
+    // Webpack configuration (only applies when not using Turbopack)
     webpack: (config, { isServer }) => {
         if (isServer) {
             config.plugins = [...config.plugins, new PrismaPlugin()];
