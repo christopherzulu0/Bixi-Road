@@ -48,6 +48,14 @@ path.join(process.cwd(), "src/generated/prisma/client/libquery_engine-debian-ope
 path.join(__dirname, "libquery_engine-rhel-openssl-3.0.x.so.node")
 path.join(process.cwd(), "src/generated/prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node")
 
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-arm64-openssl-3.0.x.so.node")
+path.join(process.cwd(), "src/generated/prisma/client/libquery_engine-linux-arm64-openssl-3.0.x.so.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node")
+path.join(process.cwd(), "src/generated/prisma/client/libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node")
+
 /**
  * Model User
  * 
