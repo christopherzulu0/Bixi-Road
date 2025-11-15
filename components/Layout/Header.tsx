@@ -7,7 +7,7 @@ import { ShoppingBag, LayoutDashboard, Shield, Newspaper, User, Menu, X, LogOut,
 import { Button } from "@/components/ui/button";
 import { SignInButton, useClerk, useUser, UserButton } from "@clerk/nextjs";
 
-function Header() {
+export default function Header() {
   const pathname = usePathname();
   const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useClerk();
@@ -307,10 +307,4 @@ function Header() {
   );
 }
 
-export default function Page() {
-  return (
-    <main className="min-h-screen bg-[#1A1A1A]">
-      <Header />
-    </main>
-  );
-}
+
