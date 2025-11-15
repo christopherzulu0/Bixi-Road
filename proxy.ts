@@ -4,7 +4,8 @@ import {NextResponse} from "next/server";
 const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
  '/(.*)',
- '/api/uploadthing'
+ '/api/uploadthing',
+ '/src/generated/prisma/client/**/**'
   // Allow internal server-to-server callback without requiring a Clerk session
   ])
 
