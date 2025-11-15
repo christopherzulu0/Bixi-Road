@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { $Enums } from "@/src/generated/prisma/client";
+import { $Enums } from "@/src/generated/prisma/client/client";
 
 type MinerProfileProduct = {
   id: string;

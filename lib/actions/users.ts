@@ -2,7 +2,8 @@
 
 import { currentUser } from "@clerk/nextjs/server";
 import prisma  from "../prisma";
-import { Role } from "@/src/generated/prisma/client";
+import { Role } from "@/src/generated/prisma/client/enums";
+
 
 export async function syncUser() {
   try {

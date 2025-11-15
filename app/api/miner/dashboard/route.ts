@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { $Enums } from "@/src/generated/prisma/client";
+import { $Enums } from "@/src/generated/prisma/client/client";
 
 const pendingTransactionStatuses: $Enums.ListingStatus[] = [
   $Enums.ListingStatus.PENDING_REVIEW,

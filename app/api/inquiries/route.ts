@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import { $Enums } from "@/src/generated/prisma/client";
+import { $Enums } from "@/src/generated/prisma/client/client";
 import { sendInquiryNotificationEmail } from "@/lib/email";
 
 type CreateInquiryRequest = {
