@@ -1,16 +1,34 @@
 'use client'
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useUploadThing } from "@/lib/uploadthing-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Shield, 
   Upload, 
@@ -21,6 +39,64 @@ import {
   MapPin,
   Loader2
 } from "lucide-react";
+
+type Country = {
+  id: string;
+  name: string;
+  flag: string;
+  code: string;
+  miner_count: number;
+  is_active: boolean;
+};
+
+type CountriesResponse = {
+  data: Country[];
+};
+
+function CountrySelectSkeleton() {
+  return <Skeleton className="h-10 w-full" />;
+}
+
+function CountrySelectContent({ 
+  value, 
+  onValueChange 
+}: { 
+  value: string; 
+  onValueChange: (value: string) => void;
+}) {
+  const { data, isLoading } = useQuery<CountriesResponse>({
+    queryKey: ["countries"],
+    queryFn: async () => {
+      const res = await fetch("/api/home/countries", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch countries");
+      return res.json() as Promise<CountriesResponse>;
+    },
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 10, // 10 minutes
+  });
+
+  if (isLoading || !data) {
+    return <CountrySelectSkeleton />;
+  }
+
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select your country" />
+      </SelectTrigger>
+      <SelectContent>
+        {data.data.map((country) => (
+          <SelectItem key={country.id} value={country.name}>
+            <div className="flex items-center gap-2">
+              <span>{country.flag}</span>
+              <span>{country.name}</span>
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 export default function BecomeASellerPage() {
   const router = useRouter();
@@ -40,6 +116,16 @@ export default function BecomeASellerPage() {
   const [uploadingFile, setUploadingFile] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
   const uploadingFileRef = React.useRef<string | null>(null);
+  const [alertDialog, setAlertDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    onConfirm?: () => void;
+  }>({
+    open: false,
+    title: "",
+    description: "",
+  });
 
   const { startUpload } = useUploadThing("sellerDocumentUploader", {
     onClientUploadComplete: (res) => {
@@ -67,7 +153,11 @@ export default function BecomeASellerPage() {
     },
     onUploadError: (error: Error) => {
       console.error("❌ Upload error:", error);
-      alert(`Upload failed: ${error.message}`);
+      setAlertDialog({
+        open: true,
+        title: "Upload Failed",
+        description: error.message || "Failed to upload file. Please try again.",
+      });
       setUploadingFile(null);
       uploadingFileRef.current = null;
     },
@@ -163,7 +253,11 @@ export default function BecomeASellerPage() {
       
     } catch (error) {
       console.error("❌ Upload error in handler:", error);
-      alert("Failed to upload file. Please try again.");
+      setAlertDialog({
+        open: true,
+        title: "Upload Failed",
+        description: "Failed to upload file. Please try again.",
+      });
       setUploadingFile(null);
       uploadingFileRef.current = null;
     }
@@ -173,12 +267,20 @@ export default function BecomeASellerPage() {
     e.preventDefault();
     
     if (!formData.country || !formData.phone || !formData.bio || !formData.mineLocation) {
-      alert("Please fill in all required fields");
+      setAlertDialog({
+        open: true,
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+      });
       return;
     }
 
     if (!formData.miningLicenseUrl || !formData.idDocumentUrl) {
-      alert("Please upload all required documents");
+      setAlertDialog({
+        open: true,
+        title: "Missing Documents",
+        description: "Please upload all required documents.",
+      });
       return;
     }
 
@@ -198,11 +300,21 @@ export default function BecomeASellerPage() {
         throw new Error(error.error || "Failed to submit application");
       }
 
-      alert("Application submitted successfully! Our team will review your documents within 3-5 business days.");
-      router.push("/");
+      setAlertDialog({
+        open: true,
+        title: "Application Submitted",
+        description: "Application submitted successfully! Our team will review your documents within 3-5 business days.",
+        onConfirm: () => {
+          router.push("/");
+        },
+      });
     } catch (error: any) {
       console.error("Submission error:", error);
-      alert(error.message || "Failed to submit application. Please try again.");
+      setAlertDialog({
+        open: true,
+        title: "Submission Failed",
+        description: error.message || "Failed to submit application. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -362,13 +474,12 @@ export default function BecomeASellerPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="country">Country *</Label>
-                    <Input
-                      id="country"
-                      value={formData.country}
-                      onChange={(e) => setFormData({...formData, country: e.target.value})}
-                      placeholder="e.g., Ghana, Kenya, Zambia"
-                      required
-                    />
+                    <Suspense fallback={<CountrySelectSkeleton />}>
+                      <CountrySelectContent
+                        value={formData.country}
+                        onValueChange={(value) => setFormData({...formData, country: value})}
+                      />
+                    </Suspense>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number *</Label>
@@ -417,12 +528,12 @@ export default function BecomeASellerPage() {
                   Required Documents
                 </h3>
 
-                <Alert>
-                  <AlertCircle className="w-4 h-4" />
-                  <AlertDescription>
+                <div className="flex items-start gap-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-blue-800">
                     Upload clear, readable copies of all documents. Supported formats: PDF, PNG, JPG
-                  </AlertDescription>
-                </Alert>
+                  </p>
+                </div>
 
                 {/* Mining License */}
                 <div className="space-y-2">
@@ -573,14 +684,14 @@ export default function BecomeASellerPage() {
               </div>
 
               {/* Verification Fee Notice */}
-              <Alert className="bg-[#D4AF37]/10 border-[#D4AF37]">
-                <Shield className="w-4 h-4 text-[#D4AF37]" />
-                <AlertDescription>
+              <div className="flex items-start gap-2 p-4 bg-[#D4AF37]/10 border border-[#D4AF37] rounded-lg">
+                <Shield className="w-5 h-5 text-[#D4AF37] mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-[#1A1A1A]">
                   <strong>Verification Fee:</strong> $100 USD (one-time payment)
                   <br />
                   This fee covers document verification and identity checks to maintain platform trust.
-                </AlertDescription>
-              </Alert>
+                </div>
+              </div>
 
               {/* Submit Button */}
               <div className="flex gap-4 pt-6">
@@ -604,6 +715,41 @@ export default function BecomeASellerPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Alert Dialog */}
+      <AlertDialog open={alertDialog.open} onOpenChange={(open) => setAlertDialog({ ...alertDialog, open })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{alertDialog.title}</AlertDialogTitle>
+            <AlertDialogDescription>{alertDialog.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            {alertDialog.onConfirm ? (
+              <>
+                <AlertDialogCancel onClick={() => setAlertDialog({ ...alertDialog, open: false })}>
+                  Close
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    alertDialog.onConfirm?.();
+                    setAlertDialog({ ...alertDialog, open: false });
+                  }}
+                  className="bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A]"
+                >
+                  Continue
+                </AlertDialogAction>
+              </>
+            ) : (
+              <AlertDialogAction
+                onClick={() => setAlertDialog({ ...alertDialog, open: false })}
+                className="bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A]"
+              >
+                OK
+              </AlertDialogAction>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

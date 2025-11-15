@@ -32,22 +32,38 @@ export async function syncUser() {
     }
 
     // Check for existing user first to preserve role if not in Clerk metadata
-    const existingByClerk = await prisma.user.findUnique({ where: { clerkId: user.id } });
-    const existingByEmail = await prisma.user.findUnique({ where: { email } });
+    const existingByClerk = await prisma.user.findUnique({ 
+      where: { clerkId: user.id },
+      select: { userpic: true, country: true },
+    });
+    const existingByEmail = await prisma.user.findUnique({ 
+      where: { email },
+      select: { userpic: true, country: true },
+    });
     const existingUser = existingByClerk || existingByEmail;
 
+    // Extract country from Clerk metadata if available
+    const metadataCountry = typeof user.publicMetadata?.country === "string"
+      ? user.publicMetadata.country
+      : undefined;
+
     // Build base data - only include role if Clerk metadata has it, otherwise preserve existing
+    // Preserve existing userpic and country if Clerk doesn't provide them
     const baseData: {
       firstName: string;
       lastName: string | null;
       email: string;
       phone: string | null;
       role?: Role;
+      userpic: string | null;
+      country?: string | null;
     } = {
       firstName: user.firstName ?? "",
       lastName: user.lastName ?? null,
       email,
       phone: user.phoneNumbers[0]?.phoneNumber ?? null,
+      userpic: user.imageUrl || existingUser?.userpic || null, // Use Clerk image, or preserve existing, or null
+      country: metadataCountry || existingUser?.country || null, // Use Clerk metadata country, or preserve existing, or null
     };
 
     // Only update role if Clerk metadata explicitly has one

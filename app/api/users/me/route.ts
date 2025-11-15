@@ -24,6 +24,8 @@ export async function GET() {
           id: true,
           role: true,
           status: true,
+          userpic: true,
+          country: true,
         },
       }),
       prisma.$queryRaw<{ is_verified_miner: boolean }[]>`
@@ -58,6 +60,8 @@ export async function GET() {
         role: normalizedRole,
         isVerifiedMiner,
         verificationStatus: dbUser.status ?? null,
+        userpic: dbUser.userpic,
+        country: dbUser.country,
       },
       { status: 200 }
     );

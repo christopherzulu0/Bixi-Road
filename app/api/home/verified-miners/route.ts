@@ -6,6 +6,7 @@ type VerifiedMiner = {
   id: string;
   full_name: string;
   country: string;
+  userpic: string | null;
   rating_average: number;
   total_reviews: number;
   total_sales: number;
@@ -27,6 +28,7 @@ export async function GET() {
         firstName: true,
         lastName: true,
         country: true,
+        userpic: true,
         productListings: {
           where: {
             status: $Enums.ListingStatus.SOLD,
@@ -59,6 +61,7 @@ export async function GET() {
         id: miner.id,
         full_name: fullName,
         country: miner.country || "",
+        userpic: miner.userpic,
         rating_average: ratingAverage,
         total_reviews: totalReviews,
         total_sales: totalSales,

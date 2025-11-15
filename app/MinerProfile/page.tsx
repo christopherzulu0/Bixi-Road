@@ -1,20 +1,37 @@
 'use client'
 
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Shield, 
   MapPin, 
   Star,
   TrendingUp,
   Package,
-  ArrowLeft
+  ArrowLeft,
+  MessageSquare,
+  CheckCircle,
+  AlertCircle
 } from "lucide-react";
 import { format } from "date-fns";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@clerk/nextjs";
 import ProductCard from "../../components/marketplace/ProductCard";
 
 type MinerProfileProduct = {
@@ -54,6 +71,7 @@ type MinerProfile = {
   country: string;
   mine_location: string | null;
   bio: string | null;
+  userpic: string | null;
   rating_average: number;
   total_reviews: number;
   total_sales: number;
@@ -108,10 +126,44 @@ function MinerProfileSkeleton() {
   );
 }
 
+type ReviewFormData = {
+  rating: number;
+  comment: string;
+  product_quality?: number;
+  communication?: number;
+  shipping_speed?: number;
+};
+
 function MinerProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const minerId = searchParams.get("id");
+  const { isSignedIn, user } = useUser();
+  const queryClient = useQueryClient();
+
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewForm, setReviewForm] = useState<ReviewFormData>({
+    rating: 0,
+    comment: "",
+    product_quality: undefined,
+    communication: undefined,
+    shipping_speed: undefined,
+  });
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [hoveredProductQuality, setHoveredProductQuality] = useState(0);
+  const [hoveredCommunication, setHoveredCommunication] = useState(0);
+  const [hoveredShippingSpeed, setHoveredShippingSpeed] = useState(0);
+  const [alertDialog, setAlertDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    type: "success" | "error";
+  }>({
+    open: false,
+    title: "",
+    description: "",
+    type: "success",
+  });
 
   const { data, isLoading } = useQuery<MinerProfileResponse>({
     queryKey: ["miner-profile", minerId],
@@ -125,6 +177,53 @@ function MinerProfileContent() {
     enabled: Boolean(minerId),
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  const reviewMutation = useMutation({
+    mutationFn: async (formData: ReviewFormData) => {
+      const res = await fetch(`/api/miners/${minerId}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to submit review");
+      }
+
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["miner-profile", minerId] });
+      setReviewDialogOpen(false);
+      setReviewForm({
+        rating: 0,
+        comment: "",
+        product_quality: undefined,
+        communication: undefined,
+        shipping_speed: undefined,
+      });
+      // Show success alert
+      setAlertDialog({
+        open: true,
+        title: "Review Submitted Successfully",
+        description: "Thank you for your review! It has been submitted and will be visible to others.",
+        type: "success",
+      });
+    },
+    onError: (error: unknown) => {
+      // Show error alert
+      setAlertDialog({
+        open: true,
+        title: "Failed to Submit Review",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to submit review. Please try again.",
+        type: "error",
+      });
+    },
   });
 
   if (isLoading || !data) {
@@ -153,9 +252,29 @@ function MinerProfileContent() {
             <div className="flex flex-col md:flex-row gap-8">
               {/* Profile Image */}
               <div className="flex-shrink-0">
-                <div className="w-32 h-32 bg-gradient-to-br from-[#D4AF37] to-[#F4E4BC] rounded-full flex items-center justify-center text-5xl font-bold text-[#1A1A1A]">
-                  {miner.full_name?.[0] || 'M'}
-                </div>
+                {miner.userpic ? (
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#D4AF37] shadow-lg relative">
+                    <Image
+                      src={miner.userpic}
+                      alt={miner.full_name}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      onError={(e) => {
+                        // Fallback to initials if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-[#D4AF37] to-[#F4E4BC] rounded-full flex items-center justify-center text-5xl font-bold text-[#1A1A1A]">${miner.full_name?.[0] || 'M'}</div>`;
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-32 h-32 bg-gradient-to-br from-[#D4AF37] to-[#F4E4BC] rounded-full flex items-center justify-center text-5xl font-bold text-[#1A1A1A] border-4 border-[#D4AF37] shadow-lg">
+                    {miner.full_name?.[0] || 'M'}
+                  </div>
+                )}
               </div>
 
               {/* Profile Info */}
@@ -243,9 +362,20 @@ function MinerProfileContent() {
 
         {/* Reviews */}
         <div>
-          <h2 className="text-2xl font-bold text-[#1A1A1A] mb-6">
-            Customer Reviews ({reviews.length})
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-[#1A1A1A]">
+              Customer Reviews ({reviews.length})
+            </h2>
+            {isSignedIn && user && (
+              <Button
+                onClick={() => setReviewDialogOpen(true)}
+                className="bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A]"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Write a Review
+              </Button>
+            )}
+          </div>
           
           {reviews.length > 0 ? (
             <div className="space-y-4">
@@ -341,6 +471,241 @@ function MinerProfileContent() {
             </Card>
           )}
         </div>
+
+        {/* Review Dialog */}
+        <AlertDialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+          <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Write a Review</AlertDialogTitle>
+              <AlertDialogDescription>
+                Share your experience with this seller
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <div className="space-y-6 py-4">
+              {/* Overall Rating */}
+              <div className="space-y-2">
+                <Label>Overall Rating *</Label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      onClick={() => setReviewForm({ ...reviewForm, rating })}
+                      onMouseEnter={() => setHoveredRating(rating)}
+                      onMouseLeave={() => setHoveredRating(0)}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        className={`w-8 h-8 transition-colors ${
+                          rating <= (hoveredRating || reviewForm.rating)
+                            ? "fill-[#D4AF37] text-[#D4AF37]"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Comment */}
+              <div className="space-y-2">
+                <Label htmlFor="comment">Your Review *</Label>
+                <Textarea
+                  id="comment"
+                  value={reviewForm.comment}
+                  onChange={(e) =>
+                    setReviewForm({ ...reviewForm, comment: e.target.value })
+                  }
+                  placeholder="Share your experience with this seller..."
+                  rows={5}
+                  required
+                />
+              </div>
+
+              {/* Detailed Ratings */}
+              <div className="space-y-4 border-t pt-4">
+                <h3 className="font-semibold text-[#1A1A1A]">Detailed Ratings (Optional)</h3>
+
+                {/* Product Quality */}
+                <div className="space-y-2">
+                  <Label>Product Quality</Label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <button
+                        key={rating}
+                        type="button"
+                        onClick={() =>
+                          setReviewForm({
+                            ...reviewForm,
+                            product_quality: rating,
+                          })
+                        }
+                        onMouseEnter={() => setHoveredProductQuality(rating)}
+                        onMouseLeave={() => setHoveredProductQuality(0)}
+                        className="focus:outline-none"
+                      >
+                        <Star
+                          className={`w-6 h-6 transition-colors ${
+                            rating <=
+                            (hoveredProductQuality ||
+                              reviewForm.product_quality ||
+                              0)
+                              ? "fill-[#D4AF37] text-[#D4AF37]"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Communication */}
+                <div className="space-y-2">
+                  <Label>Communication</Label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <button
+                        key={rating}
+                        type="button"
+                        onClick={() =>
+                          setReviewForm({
+                            ...reviewForm,
+                            communication: rating,
+                          })
+                        }
+                        onMouseEnter={() => setHoveredCommunication(rating)}
+                        onMouseLeave={() => setHoveredCommunication(0)}
+                        className="focus:outline-none"
+                      >
+                        <Star
+                          className={`w-6 h-6 transition-colors ${
+                            rating <=
+                            (hoveredCommunication ||
+                              reviewForm.communication ||
+                              0)
+                              ? "fill-[#D4AF37] text-[#D4AF37]"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Shipping Speed */}
+                <div className="space-y-2">
+                  <Label>Shipping Speed</Label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <button
+                        key={rating}
+                        type="button"
+                        onClick={() =>
+                          setReviewForm({
+                            ...reviewForm,
+                            shipping_speed: rating,
+                          })
+                        }
+                        onMouseEnter={() => setHoveredShippingSpeed(rating)}
+                        onMouseLeave={() => setHoveredShippingSpeed(0)}
+                        className="focus:outline-none"
+                      >
+                        <Star
+                          className={`w-6 h-6 transition-colors ${
+                            rating <=
+                            (hoveredShippingSpeed ||
+                              reviewForm.shipping_speed ||
+                              0)
+                              ? "fill-[#D4AF37] text-[#D4AF37]"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setReviewDialogOpen(false);
+                  setReviewForm({
+                    rating: 0,
+                    comment: "",
+                    product_quality: undefined,
+                    communication: undefined,
+                    shipping_speed: undefined,
+                  });
+                }}
+              >
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (!reviewForm.rating || !reviewForm.comment.trim()) {
+                    return;
+                  }
+                  reviewMutation.mutate(reviewForm);
+                }}
+                disabled={
+                  !reviewForm.rating ||
+                  !reviewForm.comment.trim() ||
+                  reviewMutation.isPending
+                }
+                className="bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A]"
+              >
+                {reviewMutation.isPending ? "Submitting..." : "Submit Review"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Success/Error Alert Dialog */}
+        <AlertDialog
+          open={alertDialog.open}
+          onOpenChange={(open) => setAlertDialog({ ...alertDialog, open })}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <div className="flex items-center gap-3 mb-2">
+                {alertDialog.type === "success" ? (
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                ) : (
+                  <AlertCircle className="w-6 h-6 text-red-600" />
+                )}
+                <AlertDialogTitle
+                  className={
+                    alertDialog.type === "success"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }
+                >
+                  {alertDialog.title}
+                </AlertDialogTitle>
+              </div>
+              <AlertDialogDescription>
+                {alertDialog.description}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction
+                onClick={() =>
+                  setAlertDialog({ ...alertDialog, open: false })
+                }
+                className={
+                  alertDialog.type === "success"
+                    ? "bg-[#D4AF37] hover:bg-[#F4E4BC] text-[#1A1A1A]"
+                    : "bg-red-600 hover:bg-red-700 text-white"
+                }
+              >
+                OK
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

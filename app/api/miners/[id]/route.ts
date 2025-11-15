@@ -39,6 +39,7 @@ type MinerProfile = {
   country: string;
   mine_location: string | null;
   bio: string | null;
+  userpic: string | null;
   rating_average: number;
   total_reviews: number;
   total_sales: number;
@@ -71,6 +72,7 @@ export async function GET(_req: Request, context: RouteContext) {
         lastName: true,
         country: true,
         bio: true,
+        userpic: true,
         isVerifiedMiner: true,
         sellerApplications: {
           where: {
@@ -149,8 +151,38 @@ export async function GET(_req: Request, context: RouteContext) {
       views: listing.views || 0,
     }));
 
-    // Reviews - placeholder since there's no reviews model yet
-    const reviews: MinerProfileReview[] = [];
+    // Fetch reviews
+    const reviewRecords = await prisma.review.findMany({
+      where: { sellerId: id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        buyer: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
+
+    const reviews: MinerProfileReview[] = reviewRecords.map((review) => ({
+      id: review.id,
+      buyer_name: [review.buyer.firstName, review.buyer.lastName]
+        .filter(Boolean)
+        .join(" "),
+      rating: review.rating,
+      comment: review.comment,
+      product_quality: review.productQuality,
+      communication: review.communication,
+      shipping_speed: review.shippingSpeed,
+      created_date: review.createdAt.toISOString(),
+    }));
+
+    // Calculate average rating
+    const ratingAverage =
+      reviews.length > 0
+        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+        : 0;
 
     const profile: MinerProfile = {
       id: miner.id,
@@ -158,8 +190,9 @@ export async function GET(_req: Request, context: RouteContext) {
       country: miner.country || "",
       mine_location: mineLocation,
       bio: miner.bio,
-      rating_average: 0, // Will be updated when reviews are implemented
-      total_reviews: 0, // Will be updated when reviews are implemented
+      userpic: miner.userpic,
+      rating_average: ratingAverage,
+      total_reviews: reviews.length,
       total_sales: soldListings,
       products,
       reviews,

@@ -86,3 +86,18 @@ export type Transaction = Prisma.TransactionModel
  * 
  */
 export type Inquiry = Prisma.InquiryModel
+/**
+ * Model Country
+ * 
+ */
+export type Country = Prisma.CountryModel
+/**
+ * Model Review
+ * 
+ */
+export type Review = Prisma.ReviewModel
+/**
+ * Model Testimonial
+ * 
+ */
+export type Testimonial = Prisma.TestimonialModel

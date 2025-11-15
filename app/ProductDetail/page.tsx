@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +19,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import InquiryForm from "@/components/inquiries/InquiryForm";
 
@@ -90,9 +90,30 @@ function ProductDetailSkeleton() {
 
 function ProductDetailContent({ productId }: { productId: string }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasIncrementedViews, setHasIncrementedViews] = useState(false);
+
+  // Increment view count once when component mounts
+  useEffect(() => {
+    if (productId && !hasIncrementedViews) {
+      const incrementViews = async () => {
+        try {
+          await fetch(`/api/listings/${productId}`, {
+            method: "PUT",
+          });
+          setHasIncrementedViews(true);
+          // Invalidate and refetch product data to get updated view count
+          queryClient.invalidateQueries({ queryKey: ["product", productId] });
+        } catch (error) {
+          console.error("Failed to increment views:", error);
+        }
+      };
+      incrementViews();
+    }
+  }, [productId, hasIncrementedViews, queryClient]);
 
   const { data: product, isLoading } = useQuery<ProductDetail>({
     queryKey: ["product", productId],

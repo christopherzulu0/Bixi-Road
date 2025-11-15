@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -74,6 +74,20 @@ export async function POST(req: Request) {
         status: "PENDING",
       },
     });
+
+    // Update Clerk user's publicMetadata with country
+    try {
+      const clerk = await clerkClient();
+      await clerk.users.updateUserMetadata(userId, {
+        publicMetadata: {
+          country: country,
+        },
+      });
+      console.log(`[SELLER_APPLICATION_POST] Updated Clerk metadata with country: ${country}`);
+    } catch (clerkError) {
+      // Log error but don't fail the application submission
+      console.error("[SELLER_APPLICATION_POST] Failed to update Clerk metadata:", clerkError);
+    }
 
     return NextResponse.json(application, { status: 201 });
   } catch (error) {

@@ -83,6 +83,28 @@ export async function GET(req: Request, context: RouteContext) {
   }
 }
 
+export async function PUT(req: Request, context: RouteContext) {
+  try {
+    const { id } = await context.params;
+
+    // Increment view count
+    const listing = await prisma.productListing.update({
+      where: { id },
+      data: {
+        views: { increment: 1 },
+      },
+      select: {
+        views: true,
+      },
+    });
+
+    return NextResponse.json({ views: listing.views });
+  } catch (error) {
+    console.error("[LISTINGS_ID_PUT]", error);
+    return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: Request, context: RouteContext) {
   try {
     const { userId } = await auth();

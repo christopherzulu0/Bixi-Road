@@ -128,3 +128,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Force desktop navigation to show on screens 768px and wider (desktop: 1366x768) */
+@media (min-width: 768px) {
+  .desktop-nav {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  .desktop-user-menu {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .desktop-nav {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  .desktop-user-menu {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}

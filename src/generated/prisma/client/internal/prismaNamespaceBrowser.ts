@@ -54,7 +54,10 @@ export const ModelName = {
   Article: 'Article',
   ProductListing: 'ProductListing',
   Transaction: 'Transaction',
-  Inquiry: 'Inquiry'
+  Inquiry: 'Inquiry',
+  Country: 'Country',
+  Review: 'Review',
+  Testimonial: 'Testimonial'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -75,6 +78,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  userpic: 'userpic',
   email: 'email',
   clerkId: 'clerkId',
   firstName: 'firstName',
@@ -201,6 +205,54 @@ export const InquiryScalarFieldEnum = {
 } as const
 
 export type InquiryScalarFieldEnum = (typeof InquiryScalarFieldEnum)[keyof typeof InquiryScalarFieldEnum]
+
+
+export const CountryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  flag: 'flag',
+  code: 'code',
+  minerCount: 'minerCount',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeof CountryScalarFieldEnum]
+
+
+export const ReviewScalarFieldEnum = {
+  id: 'id',
+  sellerId: 'sellerId',
+  buyerId: 'buyerId',
+  transactionId: 'transactionId',
+  rating: 'rating',
+  comment: 'comment',
+  productQuality: 'productQuality',
+  communication: 'communication',
+  shippingSpeed: 'shippingSpeed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
+
+
+export const TestimonialScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  role: 'role',
+  country: 'country',
+  flag: 'flag',
+  content: 'content',
+  rating: 'rating',
+  isApproved: 'isApproved',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TestimonialScalarFieldEnum = (typeof TestimonialScalarFieldEnum)[keyof typeof TestimonialScalarFieldEnum]
 
 
 export const SortOrder = {
