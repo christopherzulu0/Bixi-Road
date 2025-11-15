@@ -5,6 +5,7 @@ const nextConfig = {
     devIndicators: false,
     experimental: {
         authInterrupts: true,
+        serverComponentsExternalPackages: ['@prisma/client'],
     },
     typescript: {
         ignoreBuildErrors: true,
@@ -28,8 +29,15 @@ const nextConfig = {
     },
     // Include Prisma client files in output file tracing for Vercel deployment
     outputFileTracingIncludes: {
-        '/api/**/*': ['./src/generated/prisma/**/*'],
-        '/*': ['./src/generated/prisma/**/*'],
+        '/api/**/*': [
+            './src/generated/prisma/**/*',
+            './src/generated/prisma/**/*.node',
+            './node_modules/.prisma/client/**/*',
+        ],
+        '/*': [
+            './src/generated/prisma/**/*',
+            './src/generated/prisma/**/*.node',
+        ],
     },
     // Turbopack configuration (silences warning)
     turbopack: {},

@@ -1,7 +1,5 @@
 import { PrismaClient } from "@/src/generated/prisma/client"
 
-
-
 declare global {
   var prisma: PrismaClient | undefined
 }
@@ -9,10 +7,14 @@ declare global {
 let prisma: PrismaClient
 
 if (process.env.NODE_ENV === 'production') {
-    prisma = new PrismaClient()
+    prisma = new PrismaClient({
+        log: ['error'],
+    })
 } else {
     if (!global.prisma) {
-        global.prisma = new PrismaClient()
+        global.prisma = new PrismaClient({
+            log: ['query', 'error', 'warn'],
+        })
     }
     prisma = global.prisma
 }
