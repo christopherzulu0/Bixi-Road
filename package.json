@@ -10,7 +10,8 @@
     "lint": "eslint",
     "seed": "npx tsx prisma/seed.ts",
     "seed:articles": "npx tsx prisma/seed-articles.ts",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "copy-prisma-engine": "cp ./src/generated/prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node ./src/generated/prisma/libquery_engine-rhel-openssl-3.0.x.so.node || true",
+    "vercel-build": "prisma generate && prisma migrate deploy && npm run copy-prisma-engine && next build"
   },
   "exports": {
     ".": "./lib/prisma.ts"
