@@ -1,11 +1,8 @@
-import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     devIndicators: false,
     experimental: {
         authInterrupts: true,
-        serverComponentsExternalPackages: ['@prisma/client'],
     },
     typescript: {
         ignoreBuildErrors: true,
@@ -29,24 +26,20 @@ const nextConfig = {
     },
     // Include Prisma client files in output file tracing for Vercel deployment
     outputFileTracingIncludes: {
-        '/api/**/*': [
+        // Include for all API routes - explicitly include the query engine binary
+        '/api/**': [
             './src/generated/prisma/**/*',
             './src/generated/prisma/**/*.node',
-            './node_modules/.prisma/client/**/*',
+            './src/generated/prisma/libquery_engine-rhel-openssl-3.0.x.so.node',
+            './src/generated/prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node',
         ],
-        '/*': [
+        // Include for all routes (catch-all)
+        '/**': [
             './src/generated/prisma/**/*',
             './src/generated/prisma/**/*.node',
+            './src/generated/prisma/libquery_engine-rhel-openssl-3.0.x.so.node',
+            './src/generated/prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node',
         ],
-    },
-    // Turbopack configuration (silences warning)
-    turbopack: {},
-    // Webpack configuration (only applies when not using Turbopack)
-    webpack: (config, { isServer }) => {
-        if (isServer) {
-            config.plugins = [...config.plugins, new PrismaPlugin()];
-        }
-        return config;
     },
 };
 
