@@ -12,6 +12,9 @@
     "seed:articles": "npx tsx prisma/seed-articles.ts",
     "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
+  "exports": {
+    ".": "./lib/prisma.ts"
+  },
 
   "dependencies": {
     "@clerk/nextjs": "^6.34.5",
