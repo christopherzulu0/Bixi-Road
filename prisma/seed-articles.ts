@@ -1,5 +1,7 @@
 import "dotenv/config";
-import { ArticleCategory, PrismaClient } from "../src/generated/prisma/client";
+import { ArticleCategory, PrismaClient } from "@/src/generated/prisma/client/client";
+
+
 
 const prisma = new PrismaClient();
 

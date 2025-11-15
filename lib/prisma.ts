@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient } from "@/src/generated/prisma/client/client"
 
 declare global {
