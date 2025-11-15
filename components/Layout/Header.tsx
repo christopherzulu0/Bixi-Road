@@ -311,16 +311,6 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-[#1A1A1A]">
       <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-[#3E2723] border border-[#D4AF37]/20 rounded-lg p-6 sm:p-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#D4AF37] mb-4">
-            Responsive Header Demo
-          </h2>
-          <p className="text-[#FFFFF0] text-base sm:text-lg leading-relaxed">
-            Your responsive header component is now active! Try resizing your browser to mobile size to see the responsive design in action. The header will adapt with a compact logo, mobile menu button, and a collapsible navigation menu optimized for touch devices.
-          </p>
-        </div>
-      </div>
     </main>
   );
 }
