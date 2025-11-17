@@ -166,7 +166,7 @@ export default function Header() {
                 <p className="text-xs text-[#D4AF37] font-medium">Africa's Trade Highway</p>
               </div>
               <div className="sm:hidden">
-                <h1 className="text-lg font-bold text-[#FFFFF0] tracking-tight">Bixi</h1>
+                <h1 className="text-lg font-bold text-[#FFFFF0] tracking-tight">BixiRoad</h1>
               </div>
             </Link>
 
